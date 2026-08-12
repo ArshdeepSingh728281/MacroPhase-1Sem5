@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Search Foods | MacroVerse</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- UNIFIED NAVBAR -->
+  <header class="navbar">
+    <a href="index.html" class="logo">MACRO<span>VERSE</span></a>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-btn">HOME</a>
+      <a href="create-meal.html" class="nav-btn protected-link">CREATE A MEAL</a>
+      <a href="my-meals.html" class="nav-btn protected-link">MY MEALS</a>
+      <a href="search-foods.html" class="nav-btn active">SEARCH FOODS</a>
+    </nav>
+    <div class="auth-group">
+      <span id="user-display" class="user-display hidden"></span>
+      <button id="auth-btn" class="btn btn-primary">SIGN IN / SIGN UP</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>FOOD DATABASE SEARCH</h1>
+      <p>Browse nutrient profiles across the local food registry.</p>
+    </div>
+
+    <div style="margin-bottom: 2rem;">
+      <input type="text" id="food-search-input" placeholder="Search foods (e.g., Paneer, Chicken, Oats)..." class="glass-input" />
+    </div>
+
+    <div id="food-db-grid" class="grid-list">
+      <!-- Database items render here -->
+    </div>
+  </main>
+
+  <footer class="footer">
+    MACROVERSE &copy; 2026 | PRECISION REVERSE MACRO CALCULATOR
+  </footer>
+
+  <!-- AUTH MODAL -->
+  <div id="auth-modal" class="modal-overlay hidden">
+    <div class="modal-content glass-panel">
+      <button id="close-modal" class="modal-close">&times;</button>
+      <div class="modal-header">
+        <h3>ACCOUNT ACCESS</h3>
+        <p>Sign in to unlock the Meal Planner engine.</p>
+      </div>
+      <form id="auth-form">
+        <div class="form-group">
+          <label>USERNAME / EMAIL</label>
+          <input type="text" id="auth-user" placeholder="operator@macroverse.io" required />
+        </div>
+        <div class="form-group">
+          <label>PASSWORD</label>
+          <input type="password" id="auth-pass" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">SIGN IN / SIGN UP</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

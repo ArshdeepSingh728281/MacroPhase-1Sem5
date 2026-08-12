@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MacroVerse | Precision Macro Meal Planner</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    /* Smooth Scroll Base Setup */
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      overflow-x: hidden;
+    }
+    
+    /* Ensure reveal elements start invisible before GSAP controls them */
+    .reveal {
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+
+    /* Text Split Animation Styles */
+    .split-word {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: top;
+      margin-right: 0.25em;
+    }
+
+    .split-char {
+      display: inline-block;
+      will-change: transform, opacity;
+    }
+
+    /* CUSTOM FEATURE GRAPHICS STYLES */
+    .graphic-container {
+      height: 140px;
+      margin: -2.5rem -2.5rem 1.5rem -2.5rem;
+      background: #0F172A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 2px solid rgba(232, 93, 4, 0.2);
+    }
+
+    /* Grid Overlay */
+    .graphic-container::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 16px 16px;
+    }
+
+    /* 1. Combination Graphic */
+    .combinator-graphic {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1;
+    }
+    .macro-node {
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      color: #FFF;
+      position: relative;
+    }
+    .macro-node span {
+      font-size: 8px;
+      color: #E85D04;
+      font-weight: 600;
+    }
+    .combine-plus, .combine-equals {
+      color: #E85D04;
+      font-weight: 900;
+      font-size: 16px;
+    }
+    .macro-result {
+      border-color: #E85D04;
+      background: rgba(232, 93, 4, 0.15);
+      box-shadow: 0 0 15px rgba(232, 93, 4, 0.3);
+    }
+
+    /* 2. Dietary Filter Graphic */
+    .filter-graphic {
+      width: 80%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1;
+    }
+    .filter-tag-row {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .filter-tag {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .tag-active {
+      background: #E85D04;
+      color: #FFF;
+      box-shadow: 0 2px 8px rgba(232, 93, 4, 0.4);
+    }
+    .tag-inactive {
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.3);
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+    }
+
+    /* 3. Tolerance Slider Graphic */
+    .slider-graphic {
+      width: 75%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1;
+    }
+    .slider-track-wrap {
+      position: relative;
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+    }
+    .slider-fill {
+      position: absolute;
+      left: 20%;
+      width: 60%;
+      height: 100%;
+      background: #E85D04;
+      border-radius: 3px;
+    }
+    .slider-handle {
+      position: absolute;
+      left: 60%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 16px;
+      height: 16px;
+      background: #FFF;
+      border: 3px solid #E85D04;
+      border-radius: 50%;
+      box-shadow: 0 0 10px rgba(232, 93, 4, 0.5);
+    }
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.5);
+    }
+    .slider-labels .active-val {
+      color: #E85D04;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- UNIFIED NAVBAR -->
+  <header class="navbar">
+    <a href="index.html" class="logo">MACRO<span>VERSE</span></a>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-btn active">HOME</a>
+      <a href="create-meal.html" class="nav-btn protected-link">CREATE A MEAL</a>
+      <a href="my-meals.html" class="nav-btn protected-link">MY MEALS</a>
+      <a href="search-foods.html" class="nav-btn">SEARCH FOODS</a>
+    </nav>
+    <div class="auth-group">
+      <span id="user-display" class="user-display hidden"></span>
+      <button id="auth-btn" class="btn btn-primary">SIGN IN / SIGN UP</button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- SECTION 1: HERO -->
+    <section class="hero-card glass-panel reveal" style="background: linear-gradient(90deg, rgba(255, 255, 255, 0.95) 40%, rgba(255, 255, 255, 0.75) 100%), url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;">
+      <span class="badge badge-orange">REVERSE MACRO ENGINE</span>
+      <h1 class="animate-text">HIT YOUR MACROS. <br/><span class="highlight">NO GUESSWORK.</span></h1>
+      <p class="animate-p">Set your target calories and protein/carb/fat split. MacroVerse calculates real food combinations that land precisely within your tolerance band.</p>
+      <div class="hero-actions">
+        <a href="create-meal.html" class="btn btn-primary btn-lg protected-link">ADD A MEAL PLANNER</a>
+        <a href="search-foods.html" class="btn btn-secondary btn-lg">SEARCH FOODS</a>
+      </div>
+    </section>
+
+    <!-- SECTION 2: SUGGEST YOUR CHOICES -->
+    <section class="section-padding">
+      <div class="section-header reveal">
+        <span class="badge">ALGORITHMIC SUGGESTIONS</span>
+        <h2 class="animate-text">SUGGESTS YOUR CHOICES</h2>
+        <p class="animate-p">The system evaluates your preferences and builds meal sets customized to your daily nutrition needs.</p>
+      </div>
+      <div class="features-grid">
+        <!-- Card 1: Combination Graphic -->
+        <div class="glass-panel feature-card reveal" style="position: relative; overflow: hidden;">
+          <div class="graphic-container">
+            <div class="combinator-graphic">
+              <div class="macro-node">PRO<span>40g</span></div>
+              <div class="combine-plus">+</div>
+              <div class="macro-node">CARB<span>50g</span></div>
+              <div class="combine-equals">=</div>
+              <div class="macro-node macro-result">MEAL<span>#104</span></div>
+            </div>
+          </div>
+          <div class="feature-icon">01</div>
+          <h3>Smart Combinator</h3>
+          <p>Scans nutrient combinations using a subset-sum solver to eliminate manual meal logging.</p>
+        </div>
+
+        <!-- Card 2: Dietary Filter Graphic -->
+        <div class="glass-panel feature-card reveal" style="position: relative; overflow: hidden;">
+          <div class="graphic-container">
+            <div class="filter-graphic">
+              <div class="filter-tag-row">
+                <span class="filter-tag tag-active">✓ HIGH PROTEIN</span>
+                <span class="filter-tag tag-active">✓ VEGAN</span>
+              </div>
+              <div class="filter-tag-row">
+                <span class="filter-tag tag-inactive">✕ KETO</span>
+                <span class="filter-tag tag-active">✓ GLUTEN-FREE</span>
+              </div>
+            </div>
+          </div>
+          <div class="feature-icon">02</div>
+          <h3>Dietary Filter</h3>
+          <p>Prioritizes items based on your selected food preferences and daily target ratios.</p>
+        </div>
+
+        <!-- Card 3: Tolerance Band Slider Graphic -->
+        <div class="glass-panel feature-card reveal" style="position: relative; overflow: hidden;">
+          <div class="graphic-container">
+            <div class="slider-graphic">
+              <div class="slider-track-wrap">
+                <div class="slider-fill"></div>
+                <div class="slider-handle"></div>
+              </div>
+              <div class="slider-labels">
+                <span>±1% STRICT</span>
+                <span class="active-val">±5% OPTIMAL</span>
+                <span>±15% FLEX</span>
+              </div>
+            </div>
+          </div>
+          <div class="feature-icon">03</div>
+          <h3>Tolerance Band</h3>
+          <p>Adjust precision from ±1% to ±15% to balance flexibility and strict target matching.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: 500+ FOOD ITEMS DATABASE -->
+    <section class="section-padding">
+      <div class="counter-banner reveal" style="background: linear-gradient(90deg, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.8) 100%), url('https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;">
+        <div>
+          <div class="counter-number"><span id="food-counter">0</span>+</div>
+          <p style="text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;">Verified Food Registry</p>
+        </div>
+        <div class="counter-text">
+          <h3 class="animate-text">EXPANSIVE NUTRITION DATABASE</h3>
+          <p class="animate-p">Access macro profiles covering whole foods, complex items, and sports nutrition essentials.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: MACRO BREAKDOWN & NUTRIENT DISTRIBUTION -->
+    <section class="section-padding">
+      <div class="section-header reveal">
+        <span class="badge badge-orange">MACRO MATRIX</span>
+        <h2 class="animate-text">PRECISION NUTRIENT TARGETING</h2>
+        <p class="animate-p">Engineered macronutrient balances optimized for cellular repair, metabolic efficiency, and glycogen replenishment.</p>
+      </div>
+      <div class="features-grid">
+        <div class="glass-panel feature-card reveal" style="padding: 0; overflow: hidden;">
+          <img src="https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=600&q=80" alt="High Protein Foods" style="width: 100%; height: 180px; object-fit: cover;">
+          <div style="padding: 1.75rem;">
+            <span class="badge badge-protein" style="margin-bottom: 0.5rem;">40% PROTEIN</span>
+            <h3>MUSCLE REBUILDING</h3>
+            <p>Sourced from high-biological-value protein items to maximize lean muscle mass retention and recovery post-training.</p>
+          </div>
+        </div>
+        <div class="glass-panel feature-card reveal" style="padding: 0; overflow: hidden;">
+          <img src="https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80" alt="Complex Carbohydrates" style="width: 100%; height: 180px; object-fit: cover;">
+          <div style="padding: 1.75rem;">
+            <span class="badge badge-carb" style="margin-bottom: 0.5rem;">40% CARBS</span>
+            <h3>GLYCOGEN FUEL</h3>
+            <p>Complex, low-glycemic carbs structured to maintain steady blood glucose levels during intensive training cycles.</p>
+          </div>
+        </div>
+        <div class="glass-panel feature-card reveal" style="padding: 0; overflow: hidden;">
+          <img src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80" alt="Healthy Essential Fats" style="width: 100%; height: 180px; object-fit: cover;">
+          <div style="padding: 1.75rem;">
+            <span class="badge badge-fat" style="margin-bottom: 0.5rem;">20% HEALTHY FATS</span>
+            <h3>HORMONAL SUPPORT</h3>
+            <p>Essential fatty acids from clean sources formulated for optimal endocrine function and joint health.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: BODY TYPE ADAPTATION -->
+    <section class="section-padding">
+      <div class="section-header reveal">
+        <span class="badge">TARGETING</span>
+        <h2 class="animate-text">ACCORDING TO YOUR BODY TYPE</h2>
+        <p class="animate-p">Tailored macro splits engineered specifically for your body composition targets.</p>
+      </div>
+      <div class="bodytype-grid">
+        <div class="glass-panel bodytype-card reveal" style="background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%), url('https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=600&q=80') center/cover no-repeat;">
+          <span class="badge">ECTOMORPH</span>
+          <h3>HIGH CARB / BULK</h3>
+          <p>Higher carbohydrate ratios designed to sustain fast metabolisms and lean muscle building.</p>
+        </div>
+        <div class="glass-panel bodytype-card highlight-card reveal" style="background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 247, 237, 0.9) 100%), url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=600&q=80') center/cover no-repeat;">
+          <span class="badge badge-orange">MESOMORPH</span>
+          <h3>BALANCED SPLIT</h3>
+          <p>Equalized protein, carb, and fat distribution for optimal athletic performance and recovery.</p>
+        </div>
+        <div class="glass-panel bodytype-card reveal" style="background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%), url('https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=600&q=80') center/cover no-repeat;">
+          <span class="badge">ENDOMORPH</span>
+          <h3>HIGH PROTEIN / CUT</h3>
+          <p>Elevated protein and controlled carbohydrates structured to optimize body recomposition.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: WORKOUT & PERFORMANCE SYNERGY -->
+    <section class="section-padding">
+      <div class="section-header reveal">
+        <span class="badge">ATHLETIC SYNERGY</span>
+        <h2 class="animate-text">FUEL FOR HIGH PERFORMANCE</h2>
+        <p class="animate-p">Aligning macro timing with training volume for strength, hypertrophy, and athletic endurance.</p>
+      </div>
+      <div class="features-grid">
+        <div class="glass-panel feature-card reveal" style="padding: 0; overflow: hidden;">
+          <img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=600&q=80" alt="Strength & Weight Training" style="width: 100%; height: 200px; object-fit: cover;">
+          <div style="padding: 1.75rem;">
+            <h3>HYPERTROPHY & STRENGTH</h3>
+            <p>Ensure precise nitrogen balance during resistance training blocks with protein-heavy meal outputs.</p>
+          </div>
+        </div>
+        <div class="glass-panel feature-card reveal" style="padding: 0; overflow: hidden;">
+          <img src="https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=600&q=80" alt="Endurance & Cardio" style="width: 100%; height: 200px; object-fit: cover;">
+          <div style="padding: 1.75rem;">
+            <h3>ENDURANCE & ENERGY</h3>
+            <p>Optimize stamina through timed carbohydrate loading built directly into your daily solver calculations.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 7: HOW IT WORKS WORKFLOW -->
+    <section class="section-padding">
+      <div class="section-header reveal">
+        <span class="badge">WORKFLOW</span>
+        <h2 class="animate-text">HOW IT WORKS</h2>
+        <p class="animate-p">Three straightforward steps to hit your daily macro targets.</p>
+      </div>
+      <div class="steps-grid">
+        <div class="glass-panel step-card reveal">
+          <div class="step-num">01</div>
+          <h3>Set Daily Targets</h3>
+          <p>Input your target total calories and desired protein, carb, and fat split in grams.</p>
+        </div>
+        <div class="glass-panel step-card reveal">
+          <div class="step-num">02</div>
+          <h3>Run Solver Engine</h3>
+          <p>Our algorithm scans combinations to find exact meal sets matching your targets.</p>
+        </div>
+        <div class="glass-panel step-card reveal">
+          <div class="step-num">03</div>
+          <h3>Save & Track</h3>
+          <p>Save your favorite meal configurations directly to LocalStorage for fast daily reference.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 8: MEAL PREP ARCHITECTURE -->
+    <section class="section-padding">
+      <div class="section-header reveal">
+        <span class="badge badge-orange">MEAL ARCHITECTURE</span>
+        <h2 class="animate-text">PREPARATION & BATCH TRACKING</h2>
+        <p class="animate-p">Streamline cooking schedules with meal configurations built for real-world prep containers.</p>
+      </div>
+      <div class="features-grid">
+        <div class="glass-panel feature-card reveal" style="padding: 0; overflow: hidden;">
+          <img src="https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=600&q=80" alt="Meal Prep Containers" style="width: 100%; height: 180px; object-fit: cover;">
+          <div style="padding: 1.75rem;">
+            <h3>BATCH PREPARATION</h3>
+            <p>Scale generated meal sets into weekly prep schedules without losing nutrient accuracy.</p>
+          </div>
+        </div>
+        <div class="glass-panel feature-card reveal" style="padding: 0; overflow: hidden;">
+          <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80" alt="Portion Control" style="width: 100%; height: 180px; object-fit: cover;">
+          <div style="padding: 1.75rem;">
+            <h3>PORTION ACCURACY</h3>
+            <p>Get exact weight outputs in grams for every ingredient to eliminate kitchen scale uncertainty.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 9: DOWNLOAD & MEALS SORTED -->
+    <section class="section-padding">
+      <div class="glass-panel download-banner reveal" style="background: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 247, 237, 0.96) 100%), url('https://images.unsplash.com/photo-1543339308-43e59d6b73a6?auto=format&fit=crop&w=1400&q=80') center/cover no-repeat;">
+        <h2 class="animate-text">USE THIS & YOUR MEALS ARE SORTED</h2>
+        <p class="animate-p">Save MacroVerse to your home screen or desktop. Seamless local storage tracking without cloud latency.</p>
+        <div class="app-buttons">
+          <a href="create-meal.html" class="btn btn-primary btn-lg protected-link">ADD A MEAL PLANNER NOW</a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    MACROVERSE &copy; 2026 | PRECISION REVERSE MACRO CALCULATOR
+  </footer>
+
+  <!-- AUTH MODAL -->
+  <div id="auth-modal" class="modal-overlay hidden">
+    <div class="modal-content glass-panel">
+      <button id="close-modal" class="modal-close">&times;</button>
+      <div class="modal-header">
+        <h3>ACCOUNT ACCESS</h3>
+        <p>Sign in to unlock the Meal Planner engine.</p>
+      </div>
+      <form id="auth-form">
+        <div class="form-group">
+          <label>USERNAME / EMAIL</label>
+          <input type="text" id="auth-user" placeholder="operator@macroverse.io" required />
+        </div>
+        <div class="form-group">
+          <label>PASSWORD</label>
+          <input type="password" id="auth-pass" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">SIGN IN / SIGN UP</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  
+  <!-- GSAP & LENIS SMOOTH SCROLL SCRIPTS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Initialize Lenis Smooth Scroll
+      const lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+        smoothTouch: false
+      });
+
+      lenis.on('scroll', ScrollTrigger.update);
+
+      gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+      });
+
+      gsap.ticker.lagSmoothing(0);
+
+      // 2. Initialize GSAP ScrollTrigger
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Helper Utility to split text DOM elements into individual character spans
+      function splitTextToChars(element) {
+        const nodes = Array.from(element.childNodes);
+        element.innerHTML = '';
+        
+        nodes.forEach(node => {
+          if (node.nodeType === Node.TEXT_NODE) {
+            const words = node.textContent.split(' ');
+            words.forEach((word, wIdx) => {
+              if (word.length > 0) {
+                const wordSpan = document.createElement('span');
+                wordSpan.className = 'split-word';
+                
+                word.split('').forEach(char => {
+                  const charSpan = document.createElement('span');
+                  charSpan.className = 'split-char';
+                  charSpan.textContent = char;
+                  wordSpan.appendChild(charSpan);
+                });
+                
+                element.appendChild(wordSpan);
+              }
+            });
+          } else if (node.nodeType === Node.ELEMENT_NODE) {
+            const clone = node.cloneNode(true);
+            const words = clone.innerText.split(' ');
+            clone.innerHTML = '';
+            
+            words.forEach((word, wIdx) => {
+              if (word.length > 0) {
+                const wordSpan = document.createElement('span');
+                wordSpan.className = 'split-word';
+                
+                word.split('').forEach(char => {
+                  const charSpan = document.createElement('span');
+                  charSpan.className = 'split-char';
+                  charSpan.textContent = char;
+                  wordSpan.appendChild(charSpan);
+                });
+                
+                clone.appendChild(wordSpan);
+              }
+            });
+            element.appendChild(clone);
+          }
+        });
+      }
+
+      // Apply text split transformations
+      document.querySelectorAll('.animate-text').forEach(el => splitTextToChars(el));
+
+      // 3. GSAP Animations Setup
+
+      // Kinetic Character-by-Character Title Reveal
+      document.querySelectorAll('.animate-text').forEach(title => {
+        const chars = title.querySelectorAll('.split-char');
+        gsap.fromTo(chars, 
+          { opacity: 0, y: 35, rotateX: -60 },
+          {
+            opacity: 1,
+            y: 0,
+            rotateX: 0,
+            duration: 0.8,
+            stagger: 0.02,
+            ease: "back.out(1.7)",
+            scrollTrigger: {
+              trigger: title,
+              start: "top 85%",
+              toggleActions: "play none none reverse"
+            }
+          }
+        );
+      });
+
+      // Paragraph Fade & Slide-Up Reveal
+      document.querySelectorAll('.animate-p').forEach(p => {
+        gsap.fromTo(p,
+          { opacity: 0, y: 20 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.9,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: p,
+              start: "top 88%",
+              toggleActions: "play none none reverse"
+            }
+          }
+        );
+      });
+
+      // Hero Section Entrance Animation
+      gsap.fromTo(".hero-card", 
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.2,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".hero-card",
+            start: "top 85%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+
+      // Section Headers Wrapper Reveal
+      gsap.utils.toArray('.section-header').forEach((header) => {
+        gsap.fromTo(header,
+          { opacity: 0, y: 40 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: header,
+              start: "top 85%",
+              toggleActions: "play none none reverse"
+            }
+          }
+        );
+      });
+
+      // Staggered Grid Item Animations (Features, Body Types, Steps)
+      const gridContainers = document.querySelectorAll('.features-grid, .bodytype-grid, .steps-grid');
+      
+      gridContainers.forEach((grid) => {
+        const cards = grid.querySelectorAll('.reveal');
+        if (cards.length > 0) {
+          gsap.fromTo(cards,
+            { opacity: 0, y: 50 },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 0.8,
+              stagger: 0.15,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: grid,
+                start: "top 80%",
+                toggleActions: "play none none reverse"
+              }
+            }
+          );
+        }
+      });
+
+      // Counter Banner Reveal & Number Increasing Animation (0 -> 500)
+      const counterEl = document.getElementById("food-counter");
+      const counterObj = { val: 0 };
+
+      gsap.fromTo(".counter-banner",
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".counter-banner",
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+            onEnter: () => {
+              gsap.to(counterObj, {
+                val: 500,
+                duration: 2,
+                ease: "power2.out",
+                onUpdate: () => {
+                  counterEl.innerText = Math.floor(counterObj.val);
+                }
+              });
+            },
+            onLeaveBack: () => {
+              counterObj.val = 0;
+              counterEl.innerText = "0";
+            }
+          }
+        }
+      );
+
+      // Download Banner Reveal
+      gsap.fromTo(".download-banner",
+        { opacity: 0, scale: 0.95, y: 30 },
+        {
+          opacity: 1,
+          scale: 1,
+          y: 0,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: ".download-banner",
+            start: "top 85%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+    });
+  </script>
+</body>
+</html>

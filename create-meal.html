@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create a Meal | MacroVerse</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- UNIFIED NAVBAR -->
+  <header class="navbar">
+    <a href="index.html" class="logo">MACRO<span>VERSE</span></a>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-btn">HOME</a>
+      <a href="create-meal.html" class="nav-btn active protected-link">CREATE A MEAL</a>
+      <a href="my-meals.html" class="nav-btn protected-link">MY MEALS</a>
+      <a href="search-foods.html" class="nav-btn">SEARCH FOODS</a>
+    </nav>
+    <div class="auth-group">
+      <span id="user-display" class="user-display hidden"></span>
+      <button id="auth-btn" class="btn btn-primary">SIGN IN / SIGN UP</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>CREATE A MEAL PLAN</h1>
+      <p>Configure your targets to trigger the combination solver algorithm.</p>
+    </div>
+
+    <div class="planner-grid">
+      <form id="macro-form" class="glass-panel form-card">
+        <h3>TARGET METRICS</h3>
+        
+        <div class="form-group">
+          <label>TOTAL CALORIES (KCAL)</label>
+          <input type="number" id="target-calories" value="2000" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>PROTEIN (G)</label>
+            <input type="number" id="target-protein" value="150" required />
+          </div>
+          <div class="form-group">
+            <label>CARBS (G)</label>
+            <input type="number" id="target-carbs" value="200" required />
+          </div>
+          <div class="form-group">
+            <label>FAT (G)</label>
+            <input type="number" id="target-fat" value="65" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>TOLERANCE BAND (±%)</label>
+          <input type="number" id="target-tolerance" value="5" min="1" max="15" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">GENERATE COMBINATIONS</button>
+      </form>
+
+      <div class="glass-panel results-card">
+        <h3>SUGGESTED COMBINATIONS</h3>
+        <div id="combination-results">
+          <p class="empty-state">Configure targets and click Generate to run the algorithm.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    MACROVERSE &copy; 2026 | PRECISION REVERSE MACRO CALCULATOR
+  </footer>
+
+  <!-- AUTH MODAL -->
+  <div id="auth-modal" class="modal-overlay hidden">
+    <div class="modal-content glass-panel">
+      <button id="close-modal" class="modal-close">&times;</button>
+      <div class="modal-header">
+        <h3>ACCOUNT ACCESS</h3>
+        <p>Sign in to unlock the Meal Planner engine.</p>
+      </div>
+      <form id="auth-form">
+        <div class="form-group">
+          <label>USERNAME / EMAIL</label>
+          <input type="text" id="auth-user" placeholder="operator@macroverse.io" required />
+        </div>
+        <div class="form-group">
+          <label>PASSWORD</label>
+          <input type="password" id="auth-pass" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">SIGN IN / SIGN UP</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

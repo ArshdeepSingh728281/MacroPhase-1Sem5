@@ -1,13 +1,16 @@
 let currentUser = localStorage.getItem('mv_user') || null;
 
-// Helper function to fetch all registered users from localStorage
 function getUsers() {
   return JSON.parse(localStorage.getItem('mv_registered_users')) || {};
 }
 
-// Helper function to save users back to localStorage
 function saveUsers(users) {
   localStorage.setItem('mv_registered_users', JSON.stringify(users));
+}
+
+function getUserProfile(username) {
+  const profiles = JSON.parse(localStorage.getItem('mv_user_profiles')) || {};
+  return profiles[username] || null;
 }
 
 function updateAuthUI() {
@@ -18,6 +21,8 @@ function updateAuthUI() {
     if (userDisplay) {
       userDisplay.textContent = `OPERATOR: ${currentUser.toUpperCase()}`;
       userDisplay.classList.remove('hidden');
+      userDisplay.style.cursor = 'pointer';
+      userDisplay.title = 'Edit Questionnaire Profile';
     }
     if (authBtn) authBtn.textContent = 'LOGOUT';
   } else {
@@ -40,6 +45,12 @@ function login(username) {
   currentUser = username;
   localStorage.setItem('mv_user', username);
   updateAuthUI();
+
+  // Redirect to Questionnaire page if profile incomplete
+  const profile = getUserProfile(username);
+  if (!profile || !profile.onboarding_completed) {
+    window.location.href = 'questionnaire.html';
+  }
 }
 
 function logout() {
@@ -51,10 +62,18 @@ function logout() {
 
 function requireAuth(e, targetUrl) {
   e.preventDefault();
-  if (currentUser) {
-    window.location.href = targetUrl;
-  } else {
+  if (!currentUser) {
     showModal();
+    return;
+  }
+
+  // Check if questionnaire completed before entering protected pages
+  const profile = getUserProfile(currentUser);
+  if (!profile || !profile.onboarding_completed) {
+    alert('Please complete the setup questionnaire first!');
+    window.location.href = 'questionnaire.html';
+  } else {
+    window.location.href = targetUrl;
   }
 }
 
@@ -62,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateAuthUI();
 
   const authBtn = document.getElementById('auth-btn');
+  const userDisplay = document.getElementById('user-display');
   const closeModalBtn = document.getElementById('close-modal');
   const authForm = document.getElementById('auth-form');
 
@@ -69,6 +89,14 @@ document.addEventListener('DOMContentLoaded', () => {
     authBtn.addEventListener('click', () => {
       if (currentUser) logout();
       else showModal();
+    });
+  }
+
+  if (userDisplay) {
+    userDisplay.addEventListener('click', () => {
+      if (currentUser) {
+        window.location.href = 'questionnaire.html';
+      }
     });
   }
 
@@ -85,7 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const users = getUsers();
 
       if (users[user]) {
-        // User exists: verify password
         if (users[user] === pass) {
           login(user);
           hideModal();
@@ -94,10 +121,9 @@ document.addEventListener('DOMContentLoaded', () => {
           alert('Wrong password! Please try again.');
         }
       } else {
-        // New User: register and log in
         users[user] = pass;
         saveUsers(users);
-        alert('New account created and logged in!');
+        alert('New account created!');
         login(user);
         hideModal();
         authForm.reset();

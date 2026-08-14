@@ -19,7 +19,7 @@ function updateAuthUI() {
 
   if (currentUser) {
     if (userDisplay) {
-      userDisplay.textContent = `OPERATOR: ${currentUser.toUpperCase()}`;
+      userDisplay.textContent = `USER: ${currentUser.toUpperCase()}`;
       userDisplay.classList.remove('hidden');
       userDisplay.style.cursor = 'pointer';
       userDisplay.title = 'Edit Questionnaire Profile';
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (userDisplay) {
     userDisplay.addEventListener('click', () => {
       if (currentUser) {
-        window.location.href = 'questionnaire.html';
+        // window.location.href = 'questionnaire.html';
       }
     });
   }

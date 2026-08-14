@@ -35,7 +35,6 @@
       justify-content: center;
       align-items: center;
       background-color: var(--bg-space);
-      /* Crisp light grid background */
       background-image: 
         radial-gradient(circle at 50% 0%, rgba(232, 93, 4, 0.08) 0%, transparent 50%),
         radial-gradient(circle at 85% 90%, rgba(15, 23, 42, 0.05) 0%, transparent 45%),
@@ -47,7 +46,6 @@
       overflow-x: hidden;
     }
 
-    /* Header & Logo */
     .brand-header {
       text-align: center;
       margin-bottom: 2rem;
@@ -84,7 +82,6 @@
       box-shadow: 0 4px 15px rgba(232, 93, 4, 0.12);
     }
 
-    /* Card Container */
     .quest-card {
       width: 100%;
       max-width: 620px;
@@ -97,7 +94,6 @@
       position: relative;
     }
 
-    /* Meta & Progress Bar */
     .progress-meta {
       display: flex;
       justify-content: space-between;
@@ -130,7 +126,6 @@
       transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Step Container */
     .question-step {
       display: none;
       animation: fadeInSlide 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
@@ -158,17 +153,16 @@
       letter-spacing: -0.02em;
     }
 
-    /* RANGE SLIDER STYLING */
     .slider-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 1.5rem;
-      padding: 1rem 0;
+      gap: 1.25rem;
+      padding: 0.5rem 0;
     }
 
     .slider-value-display {
-      font-size: 3.25rem;
+      font-size: 3rem;
       font-weight: 900;
       color: var(--navy-main);
       letter-spacing: -0.03em;
@@ -180,12 +174,20 @@
       color: var(--orange-accent);
     }
 
+    .slider-sublabel {
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
     input[type="range"] {
       -webkit-appearance: none;
       width: 100%;
       height: 8px;
       border-radius: 9999px;
-      background: var(--input-bg);
+      background-color: #0f172a24;
       outline: none;
     }
 
@@ -206,7 +208,6 @@
       box-shadow: 0 0 18px var(--orange-accent);
     }
 
-    /* RADIO CARD GRID STYLING - OPTIMIZED FOR RESPONSIVENESS */
     .radio-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -214,14 +215,6 @@
       max-height: 320px;
       overflow-y: auto;
       padding-right: 4px;
-    }
-
-    .radio-grid::-webkit-scrollbar {
-      width: 4px;
-    }
-    .radio-grid::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-      border-radius: 4px;
     }
 
     .radio-card {
@@ -282,7 +275,6 @@
       box-shadow: 0 0 15px var(--orange-glow);
     }
 
-    /* Buttons */
     .nav-buttons {
       display: flex;
       justify-content: space-between;
@@ -329,8 +321,8 @@
     .popup-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.6);
-      backdrop-filter: blur(4px);
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(5px);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -348,12 +340,12 @@
     .popup-box {
       background: var(--card-bg);
       border: 2px solid var(--border-color);
-      border-radius: 16px;
+      border-radius: 20px;
       padding: 2rem;
       width: 90%;
-      max-width: 420px;
+      max-width: 500px;
       text-align: center;
-      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.3);
       transform: scale(0.95);
       transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
@@ -366,14 +358,14 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       background: rgba(232, 93, 4, 0.1);
       color: var(--orange-accent);
       border-radius: 50%;
-      font-size: 1.5rem;
+      font-size: 1.35rem;
       font-weight: 900;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
       border: 2px solid var(--orange-accent);
       box-shadow: 0 0 15px var(--orange-glow);
     }
@@ -382,35 +374,128 @@
       font-size: 1.25rem;
       font-weight: 900;
       color: var(--navy-main);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.25rem;
       letter-spacing: -0.02em;
     }
 
-    .popup-message {
-      font-size: 0.9rem;
-      color: var(--text-muted);
+    .popup-timeline-banner {
+      background: var(--navy-main);
+      color: #FFFFFF;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
       font-weight: 600;
-      margin-bottom: 1.75rem;
-      line-height: 1.5;
+      line-height: 1.4;
+      margin: 0.85rem 0;
+      border-left: 4px solid var(--orange-accent);
+    }
+
+    .popup-timeline-banner span {
+      color: var(--orange-accent);
+      font-weight: 900;
+    }
+
+    /* DAYS SLIDER IN POPUP */
+    .popup-slider-box {
+      background: var(--input-bg);
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .popup-slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--navy-main);
+    }
+
+    .popup-slider-header span:last-child {
+      color: var(--orange-accent);
+      font-size: 0.95rem;
+    }
+
+    .macro-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.65rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .macro-tile {
+      background: var(--input-bg);
+      border-radius: 10px;
+      padding: 0.75rem;
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .macro-tile.calories-tile {
+      grid-column: span 2;
+      background: rgba(232, 93, 4, 0.08);
+      border-color: rgba(232, 93, 4, 0.3);
+    }
+
+    .macro-tile .label {
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.2rem;
+    }
+
+    .macro-tile .val {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--navy-main);
+    }
+
+    .macro-tile.calories-tile .val {
+      color: var(--orange-accent);
+      font-size: 1.6rem;
+    }
+
+    .popup-actions {
+      display: flex;
+      gap: 0.75rem;
     }
 
     .btn-popup {
-      width: 100%;
+      flex: 1;
       padding: 0.85rem;
-      background: var(--orange-accent);
-      color: #FFFFFF;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      border: none;
       border-radius: 8px;
       cursor: pointer;
-      box-shadow: 0 4px 15px var(--orange-glow);
       transition: all 0.2s ease;
     }
 
-    .btn-popup:hover {
+    .btn-popup-secondary {
+      background: transparent;
+      color: var(--navy-main);
+      border: 2px solid var(--navy-main);
+    }
+
+    .btn-popup-secondary:hover {
+      background: var(--navy-main);
+      color: #FFFFFF;
+    }
+
+    .btn-popup-primary {
+      background: var(--orange-accent);
+      color: #FFFFFF;
+      border: none;
+      box-shadow: 0 4px 15px var(--orange-glow);
+    }
+
+    .btn-popup-primary:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(232, 93, 4, 0.4);
     }
@@ -434,9 +519,8 @@
   <!-- QUESTIONNAIRE CARD -->
   <div class="quest-card">
     
-    <!-- Progress Bar Meta -->
     <div class="progress-meta">
-      <span id="step-count">Question 1 of 17</span>
+      <span id="step-count">Question 1 of 12</span>
       <span id="step-percent">0%</span>
     </div>
     <div class="progress-container">
@@ -445,7 +529,7 @@
 
     <form id="step-by-step-form">
 
-      <!-- Step 1: Age (SLIDER) -->
+      <!-- Step 1: Age -->
       <div class="question-step active" data-key="age" data-type="slider">
         <div class="step-category">Personal Information</div>
         <div class="step-title">What is your age?</div>
@@ -455,7 +539,7 @@
         </div>
       </div>
 
-      <!-- Step 2: Gender (RADIO) -->
+      <!-- Step 2: Gender -->
       <div class="question-step" data-key="gender" data-type="radio">
         <div class="step-category">Personal Information</div>
         <div class="step-title">What is your gender?</div>
@@ -466,7 +550,7 @@
         </div>
       </div>
 
-      <!-- Step 3: Height (SLIDER) -->
+      <!-- Step 3: Height -->
       <div class="question-step" data-key="height" data-type="slider">
         <div class="step-category">Personal Information</div>
         <div class="step-title">What is your height?</div>
@@ -476,7 +560,7 @@
         </div>
       </div>
 
-      <!-- Step 4: Weight (SLIDER) -->
+      <!-- Step 4: Weight -->
       <div class="question-step" data-key="weight" data-type="slider">
         <div class="step-category">Personal Information</div>
         <div class="step-title">What is your current weight?</div>
@@ -486,7 +570,7 @@
         </div>
       </div>
 
-      <!-- Step 5: Activity Level (RADIO) -->
+      <!-- Step 5: Activity Level -->
       <div class="question-step" data-key="activity_level" data-type="radio">
         <div class="step-category">Lifestyle & Activity</div>
         <div class="step-title">How active are you on a normal day?</div>
@@ -499,60 +583,21 @@
         </div>
       </div>
 
-      <!-- Step 6: Exercise Days (RADIO) -->
-      <div class="question-step" data-key="exercise_days" data-type="radio">
-        <div class="step-category">Lifestyle & Activity</div>
-        <div class="step-title">How many days per week do you exercise?</div>
-        <div class="radio-grid">
-          <div class="radio-card"><input type="radio" name="exercise_days" id="ed0" value="0" checked><label for="ed0">0 Days</label></div>
-          <div class="radio-card"><input type="radio" name="exercise_days" id="ed1" value="1–2"><label for="ed1">1–2 Days</label></div>
-          <div class="radio-card"><input type="radio" name="exercise_days" id="ed2" value="3–5"><label for="ed2">3–5 Days</label></div>
-          <div class="radio-card"><input type="radio" name="exercise_days" id="ed3" value="6+"><label for="ed3">6+ Days</label></div>
+      <!-- Step 6: Positive / Negative Weight Change Slider -->
+      <div class="question-step" data-key="weight_change_target" data-type="slider">
+        <div class="step-category">Goal Setting</div>
+        <div class="step-title">How much weight change do you want?</div>
+        <div class="slider-container">
+          <div class="slider-value-display"><span id="val-weight-change">-5</span> <span>kg</span></div>
+          <div id="sublabel-weight-change" class="slider-sublabel">Fat Loss Target</div>
+          <input type="range" id="q-weight_change_target" min="-25" max="25" value="-5" step="0.5" oninput="updateWeightChangeDisplay(this.value)" />
         </div>
       </div>
 
-      <!-- Step 7: Exercise Type (RADIO) -->
-      <div class="question-step" data-key="exercise_type" data-type="radio">
-        <div class="step-category">Lifestyle & Activity</div>
-        <div class="step-title">What type of exercise do you do?</div>
-        <div class="radio-grid">
-          <div class="radio-card"><input type="radio" name="exercise_type" id="et1" value="Weight training" checked><label for="et1">Weight Training</label></div>
-          <div class="radio-card"><input type="radio" name="exercise_type" id="et2" value="Cardio"><label for="et2">Cardio</label></div>
-          <div class="radio-card"><input type="radio" name="exercise_type" id="et3" value="Sports"><label for="et3">Sports</label></div>
-          <div class="radio-card"><input type="radio" name="exercise_type" id="et4" value="Mixed"><label for="et4">Mixed Hybrid</label></div>
-          <div class="radio-card"><input type="radio" name="exercise_type" id="et5" value="None"><label for="et5">None</label></div>
-        </div>
-      </div>
-
-      <!-- Step 8: Primary Goal (RADIO) -->
-      <div class="question-step" data-key="primary_goal" data-type="radio">
-        <div class="step-category">Goal</div>
-        <div class="step-title">1. What is your primary goal?</div>
-        <div class="radio-grid">
-          <div class="radio-card"><input type="radio" name="primary_goal" id="pg1" value="Lose fat (cutting)" checked><label for="pg1">Lose fat (cutting)</label></div>
-          <div class="radio-card"><input type="radio" name="primary_goal" id="pg2" value="Maintain current weight"><label for="pg2">Maintain current weight</label></div>
-          <div class="radio-card"><input type="radio" name="primary_goal" id="pg3" value="Gain muscle (lean bulk)"><label for="pg3">Gain muscle (lean bulk)</label></div>
-          <div class="radio-card"><input type="radio" name="primary_goal" id="pg4" value="Gain weight (bulk)"><label for="pg4">Gain weight (bulk)</label></div>
-          <div class="radio-card"><input type="radio" name="primary_goal" id="pg5" value="Improve athletic performance"><label for="pg5">Improve athletic performance</label></div>
-        </div>
-      </div>
-
-      <!-- Step 9: Goal Magnitude (RADIO) -->
-      <div class="question-step" data-key="goal_magnitude" data-type="radio">
-        <div class="step-category">Goal</div>
-        <div class="step-title">2. How much weight change do you want?</div>
-        <div class="radio-grid">
-          <div class="radio-card"><input type="radio" name="goal_magnitude" id="gm1" value="Lose/Gain 2–5 kg" checked><label for="gm1">2 – 5 kg</label></div>
-          <div class="radio-card"><input type="radio" name="goal_magnitude" id="gm2" value="Lose/Gain 5–10 kg"><label for="gm2">5 – 10 kg</label></div>
-          <div class="radio-card"><input type="radio" name="goal_magnitude" id="gm3" value="Lose/Gain 10+ kg"><label for="gm3">10+ kg</label></div>
-          <div class="radio-card"><input type="radio" name="goal_magnitude" id="gm4" value="Not sure"><label for="gm4">Not sure / Maintain</label></div>
-        </div>
-      </div>
-
-      <!-- Step 10: Target Timeline (RADIO) -->
+      <!-- Step 7: Target Timeline -->
       <div class="question-step" data-key="target_timeline" data-type="radio">
-        <div class="step-category">Goal</div>
-        <div class="step-title">3. What is your target timeline?</div>
+        <div class="step-category">Goal Setting</div>
+        <div class="step-title">What is your target timeline?</div>
         <div class="radio-grid">
           <div class="radio-card"><input type="radio" name="target_timeline" id="tt1" value="1–3 months" checked><label for="tt1">1 – 3 Months</label></div>
           <div class="radio-card"><input type="radio" name="target_timeline" id="tt2" value="3–6 months"><label for="tt2">3 – 6 Months</label></div>
@@ -561,30 +606,9 @@
         </div>
       </div>
 
-      <!-- Step 11: Taste Preference (UPDATED) -->
-      <div class="question-step" data-key="taste_preference" data-type="radio">
-        <div class="step-category">Body & Diet</div>
-        <div class="step-title">What kind of food do you like?</div>
-        <div class="radio-grid">
-          <div class="radio-card"><input type="radio" name="taste_preference" id="tp1" value="Sweet" checked><label for="tp1">Sweet</label></div>
-          <div class="radio-card"><input type="radio" name="taste_preference" id="tp2" value="Savory"><label for="tp2">Savory</label></div>
-          <div class="radio-card"><input type="radio" name="taste_preference" id="tp3" value="Both"><label for="tp3">Both</label></div>
-        </div>
-      </div>
-
-      <!-- Step 12: Body Fat % (SLIDER) -->
-      <div class="question-step" data-key="body_fat" data-type="slider">
-        <div class="step-category">Body & Diet</div>
-        <div class="step-title">Estimate your body fat percentage:</div>
-        <div class="slider-container">
-          <div class="slider-value-display"><span id="val-bf">18</span> <span>%</span></div>
-          <input type="range" id="q-body_fat" min="5" max="45" value="18" oninput="document.getElementById('val-bf').textContent = this.value" />
-        </div>
-      </div>
-
-      <!-- Step 13: Meals Per Day (RADIO) -->
+      <!-- Step 8: Meals Per Day -->
       <div class="question-step" data-key="meals_per_day" data-type="radio">
-        <div class="step-category">Body & Diet</div>
+        <div class="step-category">Diet & Nutrition</div>
         <div class="step-title">How many meals do you prefer per day?</div>
         <div class="radio-grid">
           <div class="radio-card"><input type="radio" name="meals_per_day" id="m1" value="2"><label for="m1">2 Meals</label></div>
@@ -594,9 +618,9 @@
         </div>
       </div>
 
-      <!-- Step 14: Diet Preference (RADIO) -->
+      <!-- Step 9: Diet Preference -->
       <div class="question-step" data-key="diet_preference" data-type="radio">
-        <div class="step-category">Body & Diet</div>
+        <div class="step-category">Diet & Nutrition</div>
         <div class="step-title">What is your diet preference?</div>
         <div class="radio-grid">
           <div class="radio-card"><input type="radio" name="diet_preference" id="dp1" value="Vegetarian" checked><label for="dp1">Vegetarian</label></div>
@@ -606,9 +630,9 @@
         </div>
       </div>
 
-      <!-- Step 15: Food Restrictions (RADIO) -->
+      <!-- Step 10: Food Restrictions -->
       <div class="question-step" data-key="allergies" data-type="radio">
-        <div class="step-category">Body & Diet</div>
+        <div class="step-category">Diet & Nutrition</div>
         <div class="step-title">Any dietary restrictions or allergies?</div>
         <div class="radio-grid">
           <div class="radio-card"><input type="radio" name="allergies" id="al1" value="None" checked><label for="al1">None</label></div>
@@ -618,7 +642,7 @@
         </div>
       </div>
 
-      <!-- Step 16: Daily Steps (RADIO) -->
+      <!-- Step 11: Daily Steps -->
       <div class="question-step" data-key="daily_steps" data-type="radio">
         <div class="step-category">Personal Adjustment</div>
         <div class="step-title">How many steps do you walk per day?</div>
@@ -630,7 +654,7 @@
         </div>
       </div>
 
-      <!-- Step 17: Weight Trend (RADIO) -->
+      <!-- Step 12: Weight Trend -->
       <div class="question-step" data-key="weight_trend" data-type="radio">
         <div class="step-category">Personal Adjustment</div>
         <div class="step-title">Current weight trend:</div>
@@ -650,17 +674,75 @@
     </form>
   </div>
 
-  <!-- SUCCESS POPUP MODAL -->
+  <!-- POPUP MODAL WITH INTERACTIVE DAYS SLIDER -->
   <div id="success-popup" class="popup-overlay">
     <div class="popup-box">
       <div class="popup-badge">✓</div>
-      <div class="popup-title">SETUP INITIALIZED</div>
-      <p class="popup-message">AI Profile setup initialized successfully! Your targets and preferences have been calibrated.</p>
-      <button id="popup-confirm-btn" class="btn-popup">CONTINUE TO MEALS</button>
+      <div class="popup-title">TARGETS CALIBRATED</div>
+      
+      <div id="popup-timeline-banner" class="popup-timeline-banner">
+        To reach <span id="banner-target-weight">65kg</span>, follow these targets everyday for <span id="banner-days">77 days</span>.
+      </div>
+
+      <!-- Days Slider Box -->
+      <div id="days-slider-container" class="popup-slider-box">
+        <div class="popup-slider-header">
+          <span>Adjust Duration Timeline</span>
+          <span id="slider-days-val">77 Days</span>
+        </div>
+        <input type="range" id="days-slider" min="15" max="365" value="77" step="1" />
+      </div>
+
+      <div class="macro-summary-grid">
+        <div class="macro-tile calories-tile">
+          <div class="label">Daily Calories</div>
+          <div class="val"><span id="pop-calories">2131</span> kcal</div>
+        </div>
+        <div class="macro-tile">
+          <div class="label">Protein</div>
+          <div class="val"><span id="pop-protein">140</span>g</div>
+        </div>
+        <div class="macro-tile">
+          <div class="label">Carbs</div>
+          <div class="val"><span id="pop-carbs">260</span>g</div>
+        </div>
+        <div class="macro-tile">
+          <div class="label">Fats</div>
+          <div class="val"><span id="pop-fat">59</span>g</div>
+        </div>
+        <div class="macro-tile">
+          <div class="label">Fiber</div>
+          <div class="val"><span id="pop-fiber">30</span>g</div>
+        </div>
+      </div>
+
+      <div class="popup-actions">
+        <button id="popup-change-btn" class="btn-popup btn-popup-secondary">CHANGE GOAL</button>
+        <button id="popup-confirm-btn" class="btn-popup btn-popup-primary">CONTINUE TO MEALS</button>
+      </div>
     </div>
   </div>
 
+  <script src="js/calculator.js"></script>
+
   <script>
+    function updateWeightChangeDisplay(val) {
+      const num = parseFloat(val);
+      const display = document.getElementById('val-weight-change');
+      const sublabel = document.getElementById('sublabel-weight-change');
+      
+      if (num > 0) {
+        display.textContent = `+${num}`;
+        sublabel.textContent = "Weight / Muscle Gain Target";
+      } else if (num < 0) {
+        display.textContent = `${num}`;
+        sublabel.textContent = "Fat Loss Target";
+      } else {
+        display.textContent = `0`;
+        sublabel.textContent = "Maintain Current Weight";
+      }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       const currentUser = localStorage.getItem('mv_user');
       
@@ -678,10 +760,13 @@
 
       const popup = document.getElementById('success-popup');
       const popupConfirmBtn = document.getElementById('popup-confirm-btn');
+      const popupChangeBtn = document.getElementById('popup-change-btn');
+      const daysSlider = document.getElementById('days-slider');
+      const daysSliderBox = document.getElementById('days-slider-container');
 
       let currentStep = 0;
+      let activeFormData = {};
 
-      // Hydrate answers from profile storage
       const userProfiles = JSON.parse(localStorage.getItem('mv_user_profiles')) || {};
       const savedData = userProfiles[currentUser] || {};
 
@@ -694,8 +779,12 @@
             const input = step.querySelector('input[type="range"]');
             if (input) {
               input.value = savedData[key];
-              const display = step.querySelector('.slider-value-display span:first-child');
-              if (display) display.textContent = savedData[key];
+              if (key === 'weight_change_target') {
+                updateWeightChangeDisplay(savedData[key]);
+              } else {
+                const display = step.querySelector('.slider-value-display span:first-child');
+                if (display) display.textContent = savedData[key];
+              }
             }
           } else if (type === 'radio') {
             const radio = step.querySelector(`input[value="${savedData[key]}"]`);
@@ -704,7 +793,6 @@
         }
       });
 
-      // Synchronize visual highlight states on all radio cards
       function refreshRadioHighlights() {
         document.querySelectorAll('.radio-card').forEach(card => {
           const radio = card.querySelector('input[type="radio"]');
@@ -716,7 +804,6 @@
         });
       }
 
-      // Explicit Click Event Handler to ensure responsive radio clicks
       document.querySelectorAll('.radio-card').forEach(card => {
         card.addEventListener('click', () => {
           const radio = card.querySelector('input[type="radio"]');
@@ -726,6 +813,12 @@
           }
         });
       });
+
+      function saveProfileToLocalStorage() {
+        const allProfiles = JSON.parse(localStorage.getItem('mv_user_profiles')) || {};
+        allProfiles[currentUser] = activeFormData;
+        localStorage.setItem('mv_user_profiles', JSON.stringify(allProfiles));
+      }
 
       function updateUI() {
         steps.forEach((step, index) => {
@@ -743,40 +836,51 @@
         nextBtn.textContent = currentStep === steps.length - 1 ? 'INITIALIZE PROFILE' : 'NEXT';
       }
 
-      nextBtn.addEventListener('click', () => {
-        if (currentStep < steps.length - 1) {
-          currentStep++;
-          updateUI();
+      function updatePopupValues(selectedDays) {
+        const targetChange = parseFloat(activeFormData.weight_change_target) || 0;
+        const currentWeight = parseFloat(activeFormData.weight) || 70;
+        const targetWeight = (currentWeight + targetChange).toFixed(1);
+
+        const bannerEl = document.getElementById('popup-timeline-banner');
+
+        if (targetChange === 0) {
+          daysSliderBox.style.display = 'none';
+          bannerEl.innerHTML = `Follow these targets <span>everyday</span> to maintain your weight.`;
+          
+          const macros = calculateNutritionByDays(activeFormData, 0);
+          document.getElementById('pop-calories').textContent = macros.calories;
+          document.getElementById('pop-protein').textContent = macros.protein_g;
+          document.getElementById('pop-carbs').textContent = macros.carbohydrates_g;
+          document.getElementById('pop-fat').textContent = macros.fat_g;
+          document.getElementById('pop-fiber').textContent = macros.fiber_g;
+
+          activeFormData.calculated_targets = macros;
+          activeFormData.goal_timeline = { targetWeightKg: currentWeight, daysToGoal: 0 };
         } else {
-          // Compile step values into single payload
-          const formData = {};
-          steps.forEach(step => {
-            const key = step.getAttribute('data-key');
-            const type = step.getAttribute('data-type');
+          daysSliderBox.style.display = 'block';
+          document.getElementById('slider-days-val').textContent = `${selectedDays} Days`;
+          bannerEl.innerHTML = `To reach <span>${targetWeight}kg</span>, follow these targets everyday for <span>${selectedDays} days</span>.`;
 
-            if (type === 'slider') {
-              const slider = step.querySelector('input[type="range"]');
-              if (slider) formData[key] = slider.value;
-            } else if (type === 'radio') {
-              const checkedRadio = step.querySelector('input[type="radio"]:checked');
-              if (checkedRadio) formData[key] = checkedRadio.value;
-            }
-          });
+          const macros = calculateNutritionByDays(activeFormData, selectedDays);
+          document.getElementById('pop-calories').textContent = macros.calories;
+          document.getElementById('pop-protein').textContent = macros.protein_g;
+          document.getElementById('pop-carbs').textContent = macros.carbohydrates_g;
+          document.getElementById('pop-fat').textContent = macros.fat_g;
+          document.getElementById('pop-fiber').textContent = macros.fiber_g;
 
-          formData.onboarding_completed = true;
-
-          const profiles = JSON.parse(localStorage.getItem('mv_user_profiles')) || {};
-          profiles[currentUser] = formData;
-          localStorage.setItem('mv_user_profiles', JSON.stringify(profiles));
-
-          // Trigger Custom Popup Modal instead of native alert
-          popup.classList.add('active');
+          activeFormData.calculated_targets = macros;
+          activeFormData.goal_timeline = {
+            targetWeightKg: parseFloat(targetWeight),
+            bodyWeightChangeKg: Math.abs(targetChange),
+            daysToGoal: parseInt(selectedDays)
+          };
         }
-      });
 
-      // Handle popup confirm click
-      popupConfirmBtn.addEventListener('click', () => {
-        window.location.href = 'my-meals.html';
+        saveProfileToLocalStorage();
+      }
+
+      daysSlider.addEventListener('input', (e) => {
+        updatePopupValues(e.target.value);
       });
 
       prevBtn.addEventListener('click', () => {
@@ -784,6 +888,56 @@
           currentStep--;
           updateUI();
         }
+      });
+
+      nextBtn.addEventListener('click', () => {
+        if (currentStep < steps.length - 1) {
+          currentStep++;
+          updateUI();
+        } else {
+          // Final step submission: collect all inputs
+          steps.forEach(step => {
+            const key = step.getAttribute('data-key');
+            const type = step.getAttribute('data-type');
+
+            if (type === 'slider') {
+              const slider = step.querySelector('input[type="range"]');
+              if (slider) activeFormData[key] = slider.value;
+            } else if (type === 'radio') {
+              const checkedRadio = step.querySelector('input[type="radio"]:checked');
+              if (checkedRadio) activeFormData[key] = checkedRadio.value;
+            }
+          });
+
+          const delta = parseFloat(activeFormData.weight_change_target) || 0;
+          if (delta < 0) {
+            activeFormData.primary_goal = "Lose fat";
+          } else if (delta > 0) {
+            activeFormData.primary_goal = "Gain weight";
+          } else {
+            activeFormData.primary_goal = "Maintain weight";
+          }
+
+          const initialTimeline = calculateGoalTimeline(activeFormData);
+          const defaultDays = initialTimeline.daysToGoal || 30;
+
+          daysSlider.value = defaultDays;
+          daysSlider.min = Math.max(10, Math.round(defaultDays * 0.4));
+          daysSlider.max = Math.round(defaultDays * 2.5);
+
+          updatePopupValues(defaultDays);
+          popup.classList.add('active');
+        }
+      });
+
+      popupChangeBtn.addEventListener('click', () => {
+        popup.classList.remove('active');
+      });
+
+      popupConfirmBtn.addEventListener('click', () => {
+        saveProfileToLocalStorage();
+
+        window.location.href = 'my-meals.html';
       });
 
       updateUI();

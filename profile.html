@@ -157,13 +157,8 @@
     </div>
   </header>
 
-  <!-- MAIN CONTAINER (Matched to your structure) -->
+  <!-- MAIN CONTAINER -->
   <main class="container">
-    <!-- <div class="page-header">
-      <h1>USER PROFILE</h1>
-      <p>Manage your personal metrics, targets, and dietary preferences.</p>
-    </div> -->
-
     <!-- PROFILE EDIT CARD -->
     <div class="profile-wrapper">
       <div class="user-header-box">
@@ -278,19 +273,19 @@
               <option value="No specific timeline">No specific timeline</option>
             </select>
           </div>
-          <div class="field-group">
-            <label for="p-goal_speed">Pace/Speed</label>
-            <select id="p-goal_speed">
-              <option value="Slowly (more sustainable)">Slowly</option>
-              <option value="Moderately">Moderately</option>
-              <option value="Aggressively">Aggressively</option>
-            </select>
-          </div>
         </div>
 
         <!-- Nutrition & Preferences -->
         <div class="section-title">Nutrition & Preferences</div>
         <div class="form-grid">
+          <div class="field-group">
+            <label for="p-taste_preference">Taste Preference</label>
+            <select id="p-taste_preference">
+              <option value="Sweet">Sweet</option>
+              <option value="Savory">Savory</option>
+              <option value="Both">Both</option>
+            </select>
+          </div>
           <div class="field-group">
             <label for="p-diet_preference">Diet Type</label>
             <select id="p-diet_preference">
@@ -373,7 +368,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       const currentUser = localStorage.getItem('mv_user');
       
-      // Safety check just in case auth.js doesn't boot them fast enough
       if (!currentUser) {
         window.location.href = 'index.html';
         return;
@@ -391,8 +385,8 @@
       const fields = [
         'age', 'gender', 'height', 'weight', 'body_fat',
         'activity_level', 'exercise_days', 'exercise_type', 'daily_steps',
-        'primary_goal', 'goal_magnitude', 'target_timeline', 'goal_speed',
-        'diet_preference', 'meals_per_day', 'allergies', 'weight_trend'
+        'primary_goal', 'goal_magnitude', 'target_timeline',
+        'taste_preference', 'diet_preference', 'meals_per_day', 'allergies', 'weight_trend'
       ];
 
       fields.forEach(field => {
@@ -419,7 +413,7 @@
         alert('Profile updated successfully!');
       });
 
-      // Profile-Specific Logout Button (since you have one on the form)
+      // Profile-Specific Logout Button
       document.getElementById('profile-logout-btn').addEventListener('click', () => {
         localStorage.removeItem('mv_user');
         window.location.href = 'index.html';

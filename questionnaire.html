@@ -253,7 +253,7 @@
       margin-right: 1rem;
       transition: all 0.2s ease;
       flex-shrink: 0;
-      pointer-events: none; /* Prevents event conflicts with card container */
+      pointer-events: none;
     }
 
     .radio-card input[type="radio"]:checked {
@@ -268,7 +268,7 @@
       color: rgba(255, 255, 255, 0.8);
       cursor: pointer;
       width: 100%;
-      pointer-events: none; /* Allows card container click handler to manage state seamlessly */
+      pointer-events: none;
       transition: color 0.2s ease;
     }
 
@@ -276,7 +276,6 @@
       color: #FFFFFF;
     }
 
-    /* Class toggled dynamically via JS for bulletproof state rendering */
     .radio-card.selected {
       background: var(--navy-main);
       border-color: var(--orange-accent);
@@ -324,6 +323,96 @@
     .btn-next:hover {
       box-shadow: 0 6px 20px rgba(232, 93, 4, 0.4);
       transform: translateY(-2px);
+    }
+
+    /* POPUP MODAL STYLING */
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .popup-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .popup-box {
+      background: var(--card-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+      transform: scale(0.95);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .popup-overlay.active .popup-box {
+      transform: scale(1);
+    }
+
+    .popup-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      background: rgba(232, 93, 4, 0.1);
+      color: var(--orange-accent);
+      border-radius: 50%;
+      font-size: 1.5rem;
+      font-weight: 900;
+      margin-bottom: 1rem;
+      border: 2px solid var(--orange-accent);
+      box-shadow: 0 0 15px var(--orange-glow);
+    }
+
+    .popup-title {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--navy-main);
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .popup-message {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 1.75rem;
+      line-height: 1.5;
+    }
+
+    .btn-popup {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--orange-accent);
+      color: #FFFFFF;
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px var(--orange-glow);
+      transition: all 0.2s ease;
+    }
+
+    .btn-popup:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(232, 93, 4, 0.4);
     }
 
     @keyframes fadeInSlide {
@@ -472,14 +561,14 @@
         </div>
       </div>
 
-      <!-- Step 11: Goal Speed (RADIO) -->
-      <div class="question-step" data-key="goal_speed" data-type="radio">
-        <div class="step-category">Goal</div>
-        <div class="step-title">How quickly do you want to reach your goal?</div>
+      <!-- Step 11: Taste Preference (UPDATED) -->
+      <div class="question-step" data-key="taste_preference" data-type="radio">
+        <div class="step-category">Body & Diet</div>
+        <div class="step-title">What kind of food do you like?</div>
         <div class="radio-grid">
-          <div class="radio-card"><input type="radio" name="goal_speed" id="gs1" value="Slowly (more sustainable)" checked><label for="gs1">Slowly (More Sustainable)</label></div>
-          <div class="radio-card"><input type="radio" name="goal_speed" id="gs2" value="Moderately"><label for="gs2">Moderately</label></div>
-          <div class="radio-card"><input type="radio" name="goal_speed" id="gs3" value="Aggressively"><label for="gs3">Aggressively</label></div>
+          <div class="radio-card"><input type="radio" name="taste_preference" id="tp1" value="Sweet" checked><label for="tp1">Sweet</label></div>
+          <div class="radio-card"><input type="radio" name="taste_preference" id="tp2" value="Savory"><label for="tp2">Savory</label></div>
+          <div class="radio-card"><input type="radio" name="taste_preference" id="tp3" value="Both"><label for="tp3">Both</label></div>
         </div>
       </div>
 
@@ -561,6 +650,16 @@
     </form>
   </div>
 
+  <!-- SUCCESS POPUP MODAL -->
+  <div id="success-popup" class="popup-overlay">
+    <div class="popup-box">
+      <div class="popup-badge">✓</div>
+      <div class="popup-title">SETUP INITIALIZED</div>
+      <p class="popup-message">AI Profile setup initialized successfully! Your targets and preferences have been calibrated.</p>
+      <button id="popup-confirm-btn" class="btn-popup">CONTINUE TO MEALS</button>
+    </div>
+  </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const currentUser = localStorage.getItem('mv_user');
@@ -576,6 +675,9 @@
       const stepPercentEl = document.getElementById('step-percent');
       const prevBtn = document.getElementById('prev-btn');
       const nextBtn = document.getElementById('next-btn');
+
+      const popup = document.getElementById('success-popup');
+      const popupConfirmBtn = document.getElementById('popup-confirm-btn');
 
       let currentStep = 0;
 
@@ -614,9 +716,9 @@
         });
       }
 
-      // Explicit Click Event Handler to ensure 100% responsive radio clicks
+      // Explicit Click Event Handler to ensure responsive radio clicks
       document.querySelectorAll('.radio-card').forEach(card => {
-        card.addEventListener('click', (e) => {
+        card.addEventListener('click', () => {
           const radio = card.querySelector('input[type="radio"]');
           if (radio) {
             radio.checked = true;
@@ -667,9 +769,14 @@
           profiles[currentUser] = formData;
           localStorage.setItem('mv_user_profiles', JSON.stringify(profiles));
 
-          alert('AI Profile setup initialized successfully!');
-          window.location.href = 'create-meal.html';
+          // Trigger Custom Popup Modal instead of native alert
+          popup.classList.add('active');
         }
+      });
+
+      // Handle popup confirm click
+      popupConfirmBtn.addEventListener('click', () => {
+        window.location.href = 'my-meals.html';
       });
 
       prevBtn.addEventListener('click', () => {

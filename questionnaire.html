@@ -82,7 +82,6 @@
       box-shadow: 0 4px 15px rgba(232, 93, 4, 0.12);
     }
 
-    
     .quest-card {
       width: 100%;
       max-width: 620px;
@@ -95,7 +94,6 @@
       position: relative;
     }
 
-   
     .progress-meta {
       display: flex;
       justify-content: space-between;
@@ -817,6 +815,9 @@
       });
 
       function saveProfileToLocalStorage() {
+        // Explicitly set onboarding completion flag
+        activeFormData.onboarding_completed = true;
+
         const allProfiles = JSON.parse(localStorage.getItem('mv_user_profiles')) || {};
         allProfiles[currentUser] = activeFormData;
         localStorage.setItem('mv_user_profiles', JSON.stringify(allProfiles));
@@ -878,9 +879,11 @@
           };
         }
 
+        // Write complete profile state directly to localStorage
         saveProfileToLocalStorage();
       }
 
+      // Slider listener inside popup modal - updates state and localStorage on every slider change
       daysSlider.addEventListener('input', (e) => {
         updatePopupValues(e.target.value);
       });
@@ -911,6 +914,7 @@
             }
           });
 
+          // Infer Primary Goal based on Weight Change Target Slider Value
           const delta = parseFloat(activeFormData.weight_change_target) || 0;
           if (delta < 0) {
             activeFormData.primary_goal = "Lose fat";
@@ -920,13 +924,16 @@
             activeFormData.primary_goal = "Maintain weight";
           }
 
+          // Initial goal timeline calculation
           const initialTimeline = calculateGoalTimeline(activeFormData);
           const defaultDays = initialTimeline.daysToGoal || 30;
 
+          // Set up duration slider dynamic bounds
           daysSlider.value = defaultDays;
           daysSlider.min = Math.max(10, Math.round(defaultDays * 0.4));
           daysSlider.max = Math.round(defaultDays * 2.5);
 
+          // Calculate initial state, persist onboarding flag + targets to LocalStorage, and open modal
           updatePopupValues(defaultDays);
           popup.classList.add('active');
         }
@@ -937,11 +944,14 @@
       });
 
       popupConfirmBtn.addEventListener('click', () => {
+        // Ensure complete profile and onboarding_completed state are saved before redirecting
         saveProfileToLocalStorage();
 
+        // Redirect to meals dashboard
         window.location.href = 'my-meals.html';
       });
 
+      // Initialize Step UI
       updateUI();
     });
   </script>

@@ -69,6 +69,7 @@ function requireAuth(e, targetUrl) {
 
   // Check if questionnaire completed before entering protected pages
   const profile = getUserProfile(currentUser);
+  // console.log(profile,profile.onboarding_completed);
   if (!profile || !profile.onboarding_completed) {
     alert('Please complete the setup questionnaire first!');
     window.location.href = 'questionnaire.html';

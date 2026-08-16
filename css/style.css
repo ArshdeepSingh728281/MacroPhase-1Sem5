@@ -942,3 +942,65 @@ top:0;
 
 
 }
+
+.empty-state-container{
+
+    grid-column:1 / -1;
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+
+
+.empty-state{
+
+    width:350px;
+
+    min-height:250px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    padding:2rem;
+
+}
+
+
+
+.empty-state h3{
+
+    font-size:1.5rem;
+
+    font-weight:900;
+
+    color:var(--navy);
+
+    margin-bottom:1rem;
+
+}
+
+
+
+.empty-state p{
+
+    font-size:.9rem;
+
+    font-weight:700;
+
+    color:var(--text-muted);
+
+}

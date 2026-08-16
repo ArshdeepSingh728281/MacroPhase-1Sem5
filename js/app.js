@@ -634,7 +634,9 @@ function renderFoodDatabasePage() {
 
 if(filteredFoods.length === 0){
 
-    grid.innerHTML = `
+   grid.innerHTML = `
+
+<div class="empty-state-container">
 
     <div class="empty-state glass-panel">
 
@@ -642,13 +644,17 @@ if(filteredFoods.length === 0){
         NO FOOD ITEMS AVAILABLE
         </h3>
 
+
         <p>
         Try changing your filters or search criteria.
         </p>
 
+
     </div>
 
-    `;
+</div>
+
+`;
 
 
     updateFoodCount();

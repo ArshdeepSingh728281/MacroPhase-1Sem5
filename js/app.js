@@ -675,11 +675,12 @@ if(filteredFoods.length === 0){
 
 
       <img 
-      src="${item.image_url}" 
-      alt="${item.name}"
-      class="food-card-img"
-      loading="lazy"
-      >
+        src="${item.image_url || 'assets/default-food.png'}"
+        alt="${item.name}"
+        class="food-card-img"
+        loading="lazy"
+        onerror="this.onerror=null; this.src='assets/default-food.png';"
+        >
 
 
 

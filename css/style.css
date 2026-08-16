@@ -1010,3 +1010,62 @@ top:0;
     color:var(--text-muted);
 
 }
+
+
+.food-type {
+
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+
+    padding:0.25rem 0.5rem;
+
+    border-radius:5px;
+
+    font-size:0.65rem;
+
+    font-weight:900;
+
+    text-transform:uppercase;
+
+}
+
+
+.food-dot {
+
+    width:7px;
+    height:7px;
+
+    border-radius:50%;
+
+}
+
+
+.veg {
+
+    color:#15803d;
+    background:#dcfce7;
+
+}
+
+
+.veg .food-dot {
+
+    background:#16a34a;
+
+}
+
+
+.non-veg {
+
+    color:#dc2626;
+    background:#fee2e2;
+
+}
+
+
+.non-veg .food-dot {
+
+    background:#dc2626;
+
+}

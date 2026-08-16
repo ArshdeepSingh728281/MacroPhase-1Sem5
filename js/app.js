@@ -687,23 +687,53 @@ if(filteredFoods.length === 0){
       <div class="food-card-body">
 
 
-        <div class="tag-group">
+       <div class="tag-group">
 
-          ${
-          item.diet_tags 
-          ?
-          item.diet_tags.slice(0,2).map(tag=>`
 
-          <span class="tag tag-orange">
-          ${tag}
-          </span>
+<span class="food-type ${
+    ["vegetarian","vegan"]
+    .includes(item.type.toLowerCase())
+    ? "veg"
+    : "non-veg"
+}">
 
-          `).join('')
-          :
-          ''
-          }
+<span class="food-dot"></span>
 
-        </div>
+${
+    item.type.toLowerCase().includes("non")
+    ? "NON-VEG"
+    : item.type.toLowerCase() === "vegan"
+    ? "VEGAN"
+    : "VEG"
+}
+
+</span>
+
+
+${
+ item.diet_tags 
+ ?
+ item.diet_tags
+ .filter(tag => 
+    tag.toLowerCase() !== "vegetarian" &&
+    tag.toLowerCase() !== "vegan" &&
+    tag.toLowerCase() !== "non vegetarian" &&
+    tag.toLowerCase() !== "non-vegetarian"
+ )
+ .slice(0,2)
+ .map(tag=>`
+
+ <span class="tag tag-orange">
+ ${tag}
+ </span>
+
+ `).join('')
+ :
+ ''
+}
+
+
+</div>
 
 
 

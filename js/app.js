@@ -1,16 +1,31 @@
 document.addEventListener('DOMContentLoaded', () => {
+
   const searchInput = document.getElementById('food-search-input');
+
   if (searchInput) {
-    renderFoodDatabase(foodDatabase);
-    searchInput.addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase();
-      const filtered = foodDatabase.filter(item => 
-        item.name.toLowerCase().includes(query) || 
-        item.category.toLowerCase().includes(query)
-      );
-      renderFoodDatabase(filtered);
-    });
-  }
+
+  filteredFoods = foodDatabase;
+
+  renderFoodDatabasePage();
+
+
+  searchInput.addEventListener('input', (e) => {
+
+    const query = e.target.value.toLowerCase();
+
+    filteredFoods = foodDatabase.filter(item => 
+      item.name.toLowerCase().includes(query) ||
+      item.category.toLowerCase().includes(query)
+    );
+
+
+    currentPage = 1;
+
+    renderFoodDatabasePage();
+
+  });
+
+}
 
   const macroForm = document.getElementById('macro-form');
   if (macroForm) {
@@ -26,28 +41,192 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-function renderFoodDatabase(items) {
+const ITEMS_PER_PAGE = 10;
+
+let currentPage = 1;
+let filteredFoods = [];
+
+// function renderFoodDatabase(items) {
+//   const grid = document.getElementById('food-db-grid');
+//   if (!grid) return;
+//   grid.innerHTML = items.map(item => `
+//     <div class="glass-panel food-card">
+//       <img src="${item.image_url}" alt="${item.name}" class="food-card-img" />
+//       <div class="food-card-body">
+//         <h4 class="food-card-title">${item.name}</h4>
+//         <div class="food-card-meta">${item.category} • ${item.serving_size.amount}${item.serving_size.unit} (${item.serving_size.description})</div>
+//         <div class="tag-group">
+//           ${item.diet_tags ? item.diet_tags.map(t => `<span class="tag tag-orange">${t}</span>`).join('') : ''}
+//           <span class="tag">${item.type}</span>
+//         </div>
+//         <div class="macro-stats">
+//           <span style="color: var(--orange);">${item.macronutrients.calories} KCAL</span>
+//           <span>P: ${item.macronutrients.protein_g}g</span>
+//           <span>C: ${item.macronutrients.carbohydrates_g}g</span>
+//           <span>F: ${item.macronutrients.fat_g}g</span>
+//         </div>
+//       </div>
+//     </div>
+//   `).join('');
+// }
+
+
+function renderFoodDatabasePage() {
+
   const grid = document.getElementById('food-db-grid');
+
   if (!grid) return;
+
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+
+
+  const items = filteredFoods.slice(startIndex, endIndex);
+
+
+
   grid.innerHTML = items.map(item => `
+
     <div class="glass-panel food-card">
-      <img src="${item.image_url}" alt="${item.name}" class="food-card-img" />
+
+      <img 
+      src="${item.image_url}" 
+      alt="${item.name}" 
+      class="food-card-img"
+      loading="lazy"
+      />
+
       <div class="food-card-body">
-        <h4 class="food-card-title">${item.name}</h4>
-        <div class="food-card-meta">${item.category} • ${item.serving_size.amount}${item.serving_size.unit} (${item.serving_size.description})</div>
+
+        <h4 class="food-card-title">
+          ${item.name}
+        </h4>
+
+
+        <div class="food-card-meta">
+          ${item.category} • 
+          ${item.serving_size.amount}${item.serving_size.unit}
+        </div>
+
+
         <div class="tag-group">
-          ${item.diet_tags ? item.diet_tags.map(t => `<span class="tag tag-orange">${t}</span>`).join('') : ''}
-          <span class="tag">${item.type}</span>
+
+          ${
+          item.diet_tags 
+          ? item.diet_tags.map(t =>
+          `<span class="tag tag-orange">${t}</span>`
+          ).join('')
+          : ''
+          }
+
+
+          <span class="tag">
+          ${item.type}
+          </span>
+
         </div>
+
+
         <div class="macro-stats">
-          <span style="color: var(--orange);">${item.macronutrients.calories} KCAL</span>
-          <span>P: ${item.macronutrients.protein_g}g</span>
-          <span>C: ${item.macronutrients.carbohydrates_g}g</span>
-          <span>F: ${item.macronutrients.fat_g}g</span>
+
+          <span style="color:var(--orange)">
+          ${item.macronutrients.calories} KCAL
+          </span>
+
+          <span>
+          P:${item.macronutrients.protein_g}g
+          </span>
+
+
+          <span>
+          C:${item.macronutrients.carbohydrates_g}g
+          </span>
+
+
+          <span>
+          F:${item.macronutrients.fat_g}g
+          </span>
+
+
         </div>
+
+
       </div>
+
+
     </div>
+
+
   `).join('');
+
+
+
+  renderPagination();
+
+}
+
+
+function renderPagination(){
+
+const container = document.getElementById("pagination");
+
+if(!container) return;
+
+
+const totalPages = Math.ceil(
+  filteredFoods.length / ITEMS_PER_PAGE
+);
+
+
+container.innerHTML = `
+
+<button 
+class="btn btn-secondary"
+onclick="changePage(${currentPage-1})"
+${currentPage===1?'disabled':''}>
+PREVIOUS
+</button>
+
+
+<span style="font-weight:900;">
+PAGE ${currentPage} / ${totalPages}
+</span>
+
+
+<button 
+class="btn btn-primary"
+onclick="changePage(${currentPage+1})"
+${currentPage===totalPages?'disabled':''}>
+NEXT
+</button>
+
+`;
+
+}
+
+
+function changePage(page){
+
+const totalPages = Math.ceil(
+filteredFoods.length / ITEMS_PER_PAGE
+);
+
+
+if(page < 1 || page > totalPages)
+return;
+
+
+currentPage = page;
+
+renderFoodDatabasePage();
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
 }
 
 function runMacroSolver() {

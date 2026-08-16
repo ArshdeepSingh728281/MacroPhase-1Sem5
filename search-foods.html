@@ -346,13 +346,182 @@
 
 
 
-<main class="container">
+<main class="container food-page">
 
 
-<section class="glass-panel" style="padding:2rem;">
+<div class="food-layout">
 
 
-<div class="food-search-header">
+<!-- LEFT SIDEBAR -->
+
+<aside class="food-sidebar glass-panel">
+
+
+<h3>
+SEARCH & FILTER
+</h3>
+
+
+
+<label>
+Search Foods
+</label>
+
+<input 
+id="food-search-input"
+class="glass-input"
+placeholder="Search (Paneer, Chicken, Oats...)"
+/>
+
+
+
+
+
+<label>
+Food Type
+</label>
+
+<select id="type-filter" class="glass-input">
+
+<option value="">
+All Types
+</option>
+
+</select>
+
+
+
+
+
+<label>
+Category
+</label>
+
+<select id="category-filter" class="glass-input">
+
+<option value="">
+All Categories
+</option>
+
+</select>
+
+
+
+
+
+<label>
+Meal Type
+</label>
+
+<select id="meal-filter" class="glass-input">
+
+<option value="">
+All Meal Types
+</option>
+
+</select>
+
+
+
+
+
+<label>
+Diet Tags
+</label>
+
+<select id="tag-filter" class="glass-input">
+
+<option value="">
+All Diet Tags
+</option>
+
+</select>
+
+
+
+
+
+<label>
+Taste
+</label>
+
+<select id="taste-filter" class="glass-input">
+
+<option value="">
+All Tastes
+</option>
+
+</select>
+
+
+
+
+
+<label>
+Minimum Protein (g)
+</label>
+
+<input 
+id="protein-filter"
+type="number"
+class="glass-input"
+placeholder="e.g. 20"
+/>
+
+
+
+
+
+<label>
+Maximum Calories
+</label>
+
+<input 
+id="calorie-filter"
+type="number"
+class="glass-input"
+placeholder="e.g. 500"
+/>
+
+
+
+
+<button 
+class="btn btn-primary btn-full"
+id="apply-filter">
+
+APPLY FILTERS
+
+</button>
+
+
+
+<button 
+class="btn btn-secondary btn-full"
+id="reset-filter">
+
+RESET FILTERS
+
+</button>
+
+
+
+</aside>
+
+
+
+
+
+<!-- RIGHT CONTENT -->
+
+<section class="food-content">
+
+
+
+<div class="food-header">
+
+
+<div>
 
 <h1>
 FOOD DATABASE SEARCH
@@ -368,160 +537,47 @@ Browse 600+ nutrition profiles with calories and macro breakdown.
 
 
 
-
-<div class="search-box-wrapper">
-
-  <div class="glass-panel" style="padding:1.5rem;margin-bottom:2rem;">
-
-
-<h3 style="font-weight:900;margin-bottom:1rem;">
-FILTER FOOD DATABASE
-</h3>
-
-
-<div style="
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:1rem;
-">
-
-
-<!-- TYPE -->
-<select id="type-filter" class="glass-input">
-
-<option value="">
-ALL TYPES
-</option>
-
-<option value="Vegetarian">
-Vegetarian
-</option>
-
-<option value="Non Vegetarian">
-Non Vegetarian
-</option>
-
-<option value="Vegan">
-Vegan
-</option>
-
-<option value="Eggetarian">
-Eggetarian
-</option>
-
-</select>
-
-
-
-<!-- CATEGORY -->
-
-<select id="category-filter" class="glass-input">
-
-<option value="">
-ALL CATEGORIES
-</option>
-
-</select>
-
-
-
-
-<!-- MEAL TYPE -->
-
-<select id="meal-filter" class="glass-input">
-
-<option value="">
-ALL MEALS
-</option>
+<select id="sort-foods" class="glass-input">
 
 <option>
-Breakfast
+Name (A-Z)
 </option>
 
-<option>
-Lunch
-</option>
 
 <option>
-Dinner
+Calories Low-High
 </option>
 
+
 <option>
-Snack
+Protein High-Low
 </option>
+
 
 </select>
 
 
+</div>
 
 
 
-<!-- DIET TAG -->
-
-<select id="tag-filter" class="glass-input">
-
-<option value="">
-ALL DIET TAGS
-</option>
-
-</select>
 
 
+<div class="food-count">
 
-<!-- TASTE -->
-
-<select id="taste-filter" class="glass-input">
-
-<option value="">
-ALL TASTES
-</option>
-
-</select>
-
-
+Showing 
+<span id="food-count">
+1-10
+</span>
+of 600 foods
 
 </div>
 
 
-<br>
-
-
-<div style="
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-gap:1rem;
-">
-
-
-<input 
-id="protein-filter"
-class="glass-input"
-type="number"
-placeholder="Minimum Protein (g)"
->
-
-
-<input 
-id="calorie-filter"
-class="glass-input"
-type="number"
-placeholder="Maximum Calories"
->
 
 
 
-</div>
-
-
-</div>
-
-
-<input 
-id="food-search-input"
-class="glass-input"
-type="text"
-placeholder="Search foods (Paneer, Chicken, Oats...)"
-/>
+<div id="food-db-grid" class="food-grid">
 
 
 </div>
@@ -529,28 +585,19 @@ placeholder="Search foods (Paneer, Chicken, Oats...)"
 
 
 
-<div id="food-db-grid" class="grid-list">
 
-<p class="empty-state">
-Loading food database...
-</p>
+<div id="pagination" class="pagination">
 
 
-</div>
-<div id="pagination" 
-style="
-display:flex;
-justify-content:center;
-align-items:center;
-gap:1rem;
-margin-top:2rem;
-">
 </div>
 
 
 
 </section>
 
+
+
+</div>
 
 
 </main>

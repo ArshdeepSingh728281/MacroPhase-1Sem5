@@ -21955,7 +21955,7 @@ const foodDatabase = [
       "Energy Rich"
     ],
     "is_common_food": true,
-    "image_url": "https://www.crank-in.net/img/db/1317279_1200.jpg"
+    "image_url": "https://i.pinimg.com/736x/a2/60/c6/a260c68f128f2bf0c09187572ae4747e.jpg"
   },
   {
     "food_id": "food_000521",
@@ -21997,7 +21997,7 @@ const foodDatabase = [
       "Post Workout"
     ],
     "is_common_food": true,
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Food_sources_of_magnesium_%28magnesium-rich_foods%29.jpg/250px-Food_sources_of_magnesium_%28magnesium-rich_foods%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTybR68WbdrkR2tLV0ybdfyzJ3FKZgBqpTAfgb0yPh1STTowgAyyrQGBxI&s=10"
   },
   {
     "food_id": "food_000522",
@@ -22039,7 +22039,7 @@ const foodDatabase = [
       "Post Workout"
     ],
     "is_common_food": true,
-    "image_url": "https://media.slidesgo.com/storage/45687826/responsive-images/2-biology-subject-for-high-school-darwins-theory-of-natural-selection-infographics___media_library_original_1600_900.jpg"
+    "image_url": "https://feelgoodfoodie.net/wp-content/uploads/2017/02/strawberry-protein-smoothie-04.jpg"
   },
   {
     "food_id": "food_000523",
@@ -22079,7 +22079,7 @@ const foodDatabase = [
       "Low Fat"
     ],
     "is_common_food": true,
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/72Magnolia_Low_Fat_Milk.jpg/250px-72Magnolia_Low_Fat_Milk.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+    "image_url": "https://4.imimg.com/data4/RK/AV/MY-33299067/low-fat-milk-500x500.jpg"
   },
   {
     "food_id": "food_000524",

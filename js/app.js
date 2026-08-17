@@ -1,45 +1,4 @@
-// document.addEventListener('DOMContentLoaded', () => {
 
-//   const searchInput = document.getElementById('food-search-input');
-
-//   if (searchInput) {
-
-//   filteredFoods = foodDatabase;
-
-//   renderFoodDatabasePage();
-
-
-//   searchInput.addEventListener('input', (e) => {
-
-//     const query = e.target.value.toLowerCase();
-
-//     filteredFoods = foodDatabase.filter(item => 
-//       item.name.toLowerCase().includes(query) ||
-//       item.category.toLowerCase().includes(query)
-//     );
-
-
-//     currentPage = 1;
-
-//     renderFoodDatabasePage();
-
-//     });
-
-//   }
-
-//   const macroForm = document.getElementById('macro-form');
-//   if (macroForm) {
-//     macroForm.addEventListener('submit', (e) => {
-//       e.preventDefault();
-//       runMacroSolver();
-//     });
-//   }
-
-//   const savedContainer = document.getElementById('saved-meals-list');
-//   if (savedContainer) {
-//     renderSavedMeals();
-//   }
-// });
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -591,29 +550,6 @@ renderFoodDatabasePage();
 
 }
 
-// function renderFoodDatabase(items) {
-//   const grid = document.getElementById('food-db-grid');
-//   if (!grid) return;
-//   grid.innerHTML = items.map(item => `
-//     <div class="glass-panel food-card">
-//       <img src="${item.image_url}" alt="${item.name}" class="food-card-img" />
-//       <div class="food-card-body">
-//         <h4 class="food-card-title">${item.name}</h4>
-//         <div class="food-card-meta">${item.category} • ${item.serving_size.amount}${item.serving_size.unit} (${item.serving_size.description})</div>
-//         <div class="tag-group">
-//           ${item.diet_tags ? item.diet_tags.map(t => `<span class="tag tag-orange">${t}</span>`).join('') : ''}
-//           <span class="tag">${item.type}</span>
-//         </div>
-//         <div class="macro-stats">
-//           <span style="color: var(--orange);">${item.macronutrients.calories} KCAL</span>
-//           <span>P: ${item.macronutrients.protein_g}g</span>
-//           <span>C: ${item.macronutrients.carbohydrates_g}g</span>
-//           <span>F: ${item.macronutrients.fat_g}g</span>
-//         </div>
-//       </div>
-//     </div>
-//   `).join('');
-// }
 
 
 function renderFoodDatabasePage() {

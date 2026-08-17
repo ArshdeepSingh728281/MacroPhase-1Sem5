@@ -1,6 +1,4 @@
 
-
-
 const foodDatabase = [
   {
     "food_id": "food_000001",
@@ -22658,7 +22656,7 @@ const foodDatabase = [
       "High Fiber"
     ],
     "is_common_food": true,
-    "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/SETAF-AF_Turkey_Bowl_2021_%286953349%29.jpg/330px-SETAF-AF_Turkey_Bowl_2021_%286953349%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+    "image_url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGfkxNMsO9k9cAQmXhrQuJvMefwjrFFaKw-9bMbhjjBIoXxUkQk08M3t8P&s=10"
   },
   {
     "food_id": "food_000538",

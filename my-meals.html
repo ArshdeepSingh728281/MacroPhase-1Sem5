@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Meals | MacroVerse</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
@@ -37,9 +37,8 @@
     }
 
     .hidden { display: none !important; }
-
-    /* NAVBAR STYLES */
-    /* .navbar {
+/* 
+    .navbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -140,7 +139,6 @@
       margin-top: 0.25rem;
     }
 
-    /* 2-COLUMN LAYOUT */
     .planner-layout {
       display: grid;
       grid-template-columns: 380px 1fr;
@@ -148,7 +146,6 @@
       align-items: start;
     }
 
-    /* LEFT SIDE: TARGET CONTROL PANEL */
     .target-panel {
       background: var(--card-bg);
       border: 2px solid var(--border-color);
@@ -253,7 +250,6 @@
       line-height: 1.4;
     }
 
-    /* RIGHT SIDE: PARENT MEAL PLANNER */
     .parent-planner {
       display: flex;
       flex-direction: column;
@@ -331,7 +327,6 @@
       border: 1px solid rgba(232, 93, 4, 0.2);
     }
 
-    /* REUSABLE MACRO METRIC BARS COMPONENT */
     .macro-bars-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
@@ -370,7 +365,6 @@
 
     .progress-fill.calories-fill { background: var(--orange-accent); }
 
-    /* MEALS LIST */
     .meals-header-actions {
       display: flex;
       justify-content: space-between;
@@ -577,7 +571,6 @@
       background: rgba(232, 93, 4, 0.05);
     }
 
-    /* MEAL FINDER MODAL */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -737,7 +730,6 @@
       background: var(--orange-accent);
     }
 
-    /* AUTH MODAL STYLES */
     .auth-modal-box {
       background: #FFFFFF;
       border-radius: 20px;
@@ -898,7 +890,6 @@
     </div>
 
     <div class="planner-layout">
-      <!-- LEFT COLUMN: TARGET CONTROL PANEL -->
       <aside class="target-panel">
         <h2 class="panel-title">Calculated Targets</h2>
         
@@ -962,7 +953,6 @@
         </div>
       </aside>
 
-      <!-- RIGHT COLUMN: PARENT MEAL PLANNER -->
       <section class="parent-planner">
         <div class="overall-progress-card">
           <div class="card-top-bar">
@@ -1015,7 +1005,6 @@
     </div>
   </main>
 
-  <!-- SMART MEAL FINDER MODAL -->
   <div id="finder-modal" class="modal-overlay hidden">
     <div class="finder-modal">
       <div class="finder-header">
@@ -1041,7 +1030,6 @@
     </div>
   </div>
 
-  <!-- AUTH MODAL (SIGN IN / SIGN UP) -->
   <div id="auth-modal" class="modal-overlay hidden">
     <div class="auth-modal-box">
       <div class="auth-modal-header">
@@ -1071,7 +1059,54 @@
   </footer>
 
   <script src="js/data.js"></script>
+  <script src="js/calculator.js"></script>
   <script>
+    // Fallback calculator functions in case calculator.js fails to load
+    if (typeof getEnergyMetrics === 'undefined') {
+      window.getEnergyMetrics = function(user) {
+        const weight = parseFloat(user.weight) || 70;
+        const height = parseFloat(user.height) || 175;
+        const age = parseFloat(user.age) || 25;
+        const gender = (user.gender || 'male').toLowerCase();
+        const activityLevel = user.activity_level || 'Moderately active';
+        let bmr = gender === 'male' 
+          ? (10 * weight) + (6.25 * height) - (5 * age) + 5
+          : (10 * weight) + (6.25 * height) - (5 * age) - 161;
+        const multipliers = { "Sedentary": 1.2, "Lightly active": 1.375, "Moderately active": 1.55, "Very active": 1.725, "Extremely active": 1.9 };
+        return { bmr, tdee: bmr * (multipliers[activityLevel] || 1.55), weight, height, age, gender };
+      };
+    }
+
+    if (typeof calculateGoalTimeline === 'undefined') {
+      window.calculateGoalTimeline = function(user) {
+        const currentWeight = parseFloat(user.weight) || 70;
+        const targetChange = parseFloat(user.weight_change_target) || 0;
+        if (targetChange === 0) {
+          return { targetWeightKg: currentWeight, bodyWeightChangeKg: 0, daysToGoal: 0, goalDirection: "maintain" };
+        }
+        const absWeightChange = Math.abs(targetChange);
+        const totalCalorieNeed = absWeightChange * 7700;
+        const dailyCalorieDelta = targetChange < 0 ? 500 : 300;
+        const daysToGoal = Math.round(totalCalorieNeed / dailyCalorieDelta);
+        const goalDirection = targetChange < 0 ? "lose" : "gain";
+        const targetWeight = currentWeight + targetChange;
+        return { targetWeightKg: parseFloat(targetWeight.toFixed(1)), bodyWeightChangeKg: absWeightChange, daysToGoal: daysToGoal, goalDirection: goalDirection };
+      };
+    }
+
+    if (typeof calculateNutrition === 'undefined') {
+      window.calculateNutrition = function(user) {
+        const { tdee } = getEnergyMetrics(user);
+        const targetChange = parseFloat(user.weight_change_target) || 0;
+        if (targetChange === 0) {
+          return { calories: Math.round(tdee), protein_g: 0, carbohydrates_g: 0, fat_g: 0, fiber_g: 0, dailyDelta: 0 };
+        }
+        const dailyDelta = targetChange < 0 ? 500 : 300;
+        const calories = targetChange < 0 ? Math.round(tdee - dailyDelta) : Math.round(tdee + dailyDelta);
+        return { calories, protein_g: 0, carbohydrates_g: 0, fat_g: 0, fiber_g: 0, dailyDelta };
+      };
+    }
+
     // ========================================================================
     // 1. AUTHENTICATION MODULE
     // ========================================================================
@@ -1123,7 +1158,6 @@
       localStorage.setItem('mv_user', username);
       updateAuthUI();
 
-      // Redirect to Questionnaire page if profile incomplete
       const profile = getUserProfile(username);
       if (!profile || !profile.onboarding_completed) {
         window.location.href = 'questionnaire.html';
@@ -1200,7 +1234,6 @@
       }
     }
 
-    // Meal planner state - only load when user is authenticated
     let profile = null;
     let mealPlannerParent = null;
     let activeTargetMealId = null;
@@ -1213,36 +1246,50 @@
 
       if (!userProfiles[currentUser]) {
         userProfiles[currentUser] = {
+          age: "25",
           gender: "Male",
+          height: "175",
+          weight: "70",
+          activity_level: "Sedentary",
           diet_preference: "Vegetarian",
           daily_steps: "3000–7000",
-          calculated_targets: { calories: 1509, protein_g: 140, carbohydrates_g: 143, fat_g: 42, fiber_g: 21, dailyDelta: 500 },
-          goal_timeline: { targetWeightKg: 65, bodyWeightChangeKg: 5, daysToGoal: 77 },
-          onboarding_completed: true
+          weight_change_target: "-5",
+          onboarding_completed: false
         };
         localStorage.setItem('mv_user_profiles', JSON.stringify(userProfiles));
+        window.location.href = 'questionnaire.html';
+        return;
       }
 
       profile = userProfiles[currentUser];
 
-      if (!profile.calculated_targets) {
-        profile.calculated_targets = { calories: 1509, protein_g: 140, carbohydrates_g: 143, fat_g: 42, fiber_g: 21, dailyDelta: 500 };
-      }
-      if (!profile.goal_timeline) {
-        profile.goal_timeline = { targetWeightKg: 65, bodyWeightChangeKg: 5, daysToGoal: 77 };
+      // Calculate targets using the proper algorithm if not already calculated
+      if (!profile.calculated_targets || !profile.goal_timeline) {
+        const calculatedNutrition = calculateNutrition(profile);
+        const goalTimeline = calculateGoalTimeline(profile);
+        
+        profile.calculated_targets = calculatedNutrition;
+        profile.goal_timeline = goalTimeline;
+        
+        userProfiles[currentUser] = profile;
+        localStorage.setItem('mv_user_profiles', JSON.stringify(userProfiles));
       }
 
-      mealPlannerParent = profile.mealPlannerParent || {
-        weeklyAdherence: [false, false, false, false, false, false, false],
-        meals: [
-          { id: "m1", name: "Breakfast", foods: [] },
-          { id: "m2", name: "Lunch", foods: [] },
-          { id: "m3", name: "Dinner", foods: [] }
-        ]
-      };
+      // Ensure mealPlannerParent exists
+      if (!profile.mealPlannerParent) {
+        profile.mealPlannerParent = {
+          weeklyAdherence: [false, false, false, false, false, false, false],
+          meals: [
+            { id: "m1", name: "Breakfast", foods: [] },
+            { id: "m2", name: "Lunch", foods: [] },
+            { id: "m3", name: "Dinner", foods: [] }
+          ]
+        };
+      }
+
+      mealPlannerParent = profile.mealPlannerParent;
     }
 
-    // --- DOM REFERENCES ---
     let sldCal, sldPro, sldCarb, sldFat, sldFib, sldDelta;
     let lblCal, lblPro, lblCarb, lblFat, lblFib, lblDelta;
     let goalText, mealsContainer, finderModal, finderSearchInput;
@@ -1268,22 +1315,92 @@
       finderSearchInput = document.getElementById('finder-search-input');
     }
 
-    function recalculateGoalTimeline() {
+    // FIXED: Now properly responds to all slider changes
+    function recalculateGoalTimeline(changedKey) {
       if (!profile) return;
-      const calories = profile.calculated_targets.calories || 1509;
-      const delta = profile.calculated_targets.dailyDelta || 500;
-      const bodyWeightChangeKg = profile.goal_timeline.bodyWeightChangeKg || 5;
 
-      const maintenanceCalories = 2200;
-      const calorieDeficit = maintenanceCalories - calories;
-      const totalDailyDeficit = calorieDeficit + (delta / 2);
-      const effectiveDeficit = Math.max(100, Math.abs(totalDailyDeficit));
-      const totalCaloricDeficitNeeded = bodyWeightChangeKg * 7700;
+      const { tdee } = getEnergyMetrics(profile);
+      const weightChangeTarget = parseFloat(profile.weight_change_target) || 0;
+      const currentWeight = parseFloat(profile.weight) || 70;
 
-      const daysToGoal = Math.max(10, Math.round(totalCaloricDeficitNeeded / effectiveDeficit));
-      profile.goal_timeline.daysToGoal = daysToGoal;
+      // Handle maintenance case (no weight change target)
+      if (weightChangeTarget === 0) {
+        profile.goal_timeline = {
+          targetWeightKg: currentWeight,
+          bodyWeightChangeKg: 0,
+          daysToGoal: 0,
+          goalDirection: "maintain"
+        };
+        goalText.textContent = `Maintaining at ${currentWeight} kg`;
+        saveState();
+        return;
+      }
 
-      goalText.textContent = `Target: ${profile.goal_timeline.targetWeightKg} kg (Change: ${bodyWeightChangeKg} kg) in ${daysToGoal} Days`;
+      let effectiveDelta;
+      let newCalories = parseInt(sldCal.value);
+      let newDelta = parseInt(sldDelta.value);
+
+      // Determine which slider changed and update accordingly
+      if (changedKey === 'calories') {
+        // Calorie slider changed → derive delta from TDEE
+        if (weightChangeTarget < 0) {
+          // Losing weight: deficit = TDEE - calories
+          newDelta = Math.round(tdee - newCalories);
+        } else {
+          // Gaining weight: surplus = calories - TDEE
+          newDelta = Math.round(newCalories - tdee);
+        }
+        // Update delta slider to reflect new deficit
+        sldDelta.value = newDelta;
+        lblDelta.textContent = `${newDelta} kcal`;
+        effectiveDelta = newDelta;
+      } else if (changedKey === 'dailyDelta') {
+        // Delta slider changed → derive calories from TDEE
+        effectiveDelta = newDelta;
+        if (weightChangeTarget < 0) {
+          // Losing: calories = TDEE - delta
+          newCalories = Math.round(tdee - newDelta);
+        } else {
+          // Gaining: calories = TDEE + delta
+          newCalories = Math.round(tdee + newDelta);
+        }
+        // Enforce safety floors
+        const minCal = (profile.gender || '').toLowerCase() === 'female' ? 1200 : 1500;
+        newCalories = Math.max(newCalories, minCal);
+        // Update calorie slider
+        sldCal.value = newCalories;
+        lblCal.textContent = `${newCalories} kcal`;
+      } else {
+        // Initial load or protein/carb/fat/fiber change — use current delta
+        effectiveDelta = newDelta;
+      }
+
+      // Sync all profile values from sliders
+      profile.calculated_targets.calories = newCalories;
+      profile.calculated_targets.protein_g = parseInt(sldPro.value);
+      profile.calculated_targets.carbohydrates_g = parseInt(sldCarb.value);
+      profile.calculated_targets.fat_g = parseInt(sldFat.value);
+      profile.calculated_targets.fiber_g = parseInt(sldFib.value);
+      profile.calculated_targets.dailyDelta = newDelta;
+
+      // Calculate days to goal: total caloric need ÷ effective daily deficit
+      const absWeightChange = Math.abs(weightChangeTarget);
+      const totalCalorieNeed = absWeightChange * 7700;
+      const safeDelta = Math.max(50, Math.abs(effectiveDelta)); // Minimum 50 kcal to avoid infinite days
+      const daysToGoal = Math.max(7, Math.round(totalCalorieNeed / safeDelta));
+
+      const goalDirection = weightChangeTarget < 0 ? "lose" : "gain";
+      const targetWeight = currentWeight + weightChangeTarget;
+
+      profile.goal_timeline = {
+        targetWeightKg: parseFloat(targetWeight.toFixed(1)),
+        bodyWeightChangeKg: absWeightChange,
+        daysToGoal: daysToGoal,
+        goalDirection: goalDirection
+      };
+
+      // Update the goal timeline display
+      goalText.textContent = `Target: ${profile.goal_timeline.targetWeightKg} kg (Change: ${absWeightChange} kg) in ${daysToGoal} Days`;
       saveState();
     }
 
@@ -1297,7 +1414,7 @@
     }
 
     function initSliders() {
-      if (!profile) return;
+      if (!profile || !profile.calculated_targets) return;
       const targets = profile.calculated_targets;
       
       document.getElementById('badge-gender').textContent = profile.gender || "Male";
@@ -1311,15 +1428,15 @@
       sldFib.value = targets.fiber_g; lblFib.textContent = `${targets.fiber_g} g`;
       sldDelta.value = targets.dailyDelta; lblDelta.textContent = `${targets.dailyDelta} kcal`;
 
+      // Initial goal timeline calculation
       recalculateGoalTimeline();
 
+      // Bind each slider with its key so we know which one changed
       const bindSlider = (elem, lbl, key, unit) => {
         elem.addEventListener('input', (e) => {
           const val = parseInt(e.target.value);
-          profile.calculated_targets[key] = val;
           lbl.textContent = `${val} ${unit}`;
-          recalculateGoalTimeline();
-          saveState();
+          recalculateGoalTimeline(key); // Pass which slider changed
           renderMeals();
         });
       };
@@ -1366,7 +1483,7 @@
     }
 
     function generateMacroBarsHTML(macronutrients) {
-      if (!profile) return '';
+      if (!profile || !profile.calculated_targets) return '';
       const t = profile.calculated_targets;
       const m = macronutrients;
 
@@ -1403,7 +1520,7 @@
     }
 
     function renderProgressBars() {
-      if (!mealPlannerParent || !profile) return;
+      if (!mealPlannerParent || !profile || !profile.calculated_targets) return;
       let totals = { calories: 0, protein_g: 0, carbohydrates_g: 0, fat_g: 0, fiber_g: 0 };
 
       mealPlannerParent.meals.forEach(m => {
@@ -1618,7 +1735,7 @@
     }
 
     function renderRecommendations(mealName) {
-      if (!profile) return;
+      if (!profile || !profile.calculated_targets) return;
       const isVeg = (profile.diet_preference || "Vegetarian").toLowerCase().includes("veg") && 
                     !(profile.diet_preference || "").toLowerCase().includes("non");
       const isBreakfast = mealName.toLowerCase().includes("breakfast");
@@ -1683,12 +1800,10 @@
     };
 
     // ========================================================================
-    // 3. MASTER INITIALIZATION (AUTH + MEAL PLANNER)
+    // 3. MASTER INITIALIZATION
     // ========================================================================
     document.addEventListener('DOMContentLoaded', async () => {
       cacheDomReferences();
-
-      // --- AUTH EVENT BINDINGS ---
       updateAuthUI();
 
       const authBtn = document.getElementById('auth-btn');
@@ -1757,7 +1872,6 @@
         });
       });
 
-      // Close auth modal on backdrop click
       const authModal = document.getElementById('auth-modal');
       if (authModal) {
         authModal.addEventListener('click', (e) => {
@@ -1765,62 +1879,62 @@
         });
       }
 
-      // --- MEAL PLANNER INITIALIZATION ---
       if (!currentUser) {
-        // Don't run meal planner logic if not authenticated
         return;
       }
 
       await fetchFoodDatabase();
       loadMealPlannerState();
-      initSliders();
-      renderWeekTracker();
-      renderMeals();
-
-      document.getElementById('btn-add-new-meal').addEventListener('click', () => {
-        const newNum = mealPlannerParent.meals.length + 1;
-        mealPlannerParent.meals.push({
-          id: `m_${Date.now()}`,
-          name: `Meal ${newNum}`,
-          foods: []
-        });
-        saveState();
+      
+      if (profile) {
+        initSliders();
+        renderWeekTracker();
         renderMeals();
-      });
 
-      finderSearchInput.addEventListener('input', (e) => {
-        const query = e.target.value.trim().toLowerCase();
-        
-        if (!query) {
-          document.getElementById('search-results-section').style.display = 'none';
-          document.getElementById('recommendations-section').style.display = 'block';
-          return;
-        }
+        document.getElementById('btn-add-new-meal').addEventListener('click', () => {
+          const newNum = mealPlannerParent.meals.length + 1;
+          mealPlannerParent.meals.push({
+            id: `m_${Date.now()}`,
+            name: `Meal ${newNum}`,
+            foods: []
+          });
+          saveState();
+          renderMeals();
+        });
 
-        document.getElementById('search-results-section').style.display = 'block';
-        document.getElementById('recommendations-section').style.display = 'none';
+        finderSearchInput.addEventListener('input', (e) => {
+          const query = e.target.value.trim().toLowerCase();
+          
+          if (!query) {
+            document.getElementById('search-results-section').style.display = 'none';
+            document.getElementById('recommendations-section').style.display = 'block';
+            return;
+          }
 
-        const filtered = rawFoodDatabase.filter(f => 
-          f.name.toLowerCase().includes(query) || 
-          (f.category && f.category.toLowerCase().includes(query))
-        );
+          document.getElementById('search-results-section').style.display = 'block';
+          document.getElementById('recommendations-section').style.display = 'none';
 
-        const tCal = profile.calculated_targets.calories || 1509;
-        filtered.sort((a, b) => 
-          Math.abs((a.macronutrients.calories || 0) - tCal * 0.25) - 
-          Math.abs((b.macronutrients.calories || 0) - tCal * 0.25)
-        );
+          const filtered = rawFoodDatabase.filter(f => 
+            f.name.toLowerCase().includes(query) || 
+            (f.category && f.category.toLowerCase().includes(query))
+          );
 
-        renderFoodGrid('search-results-grid', filtered);
-      });
+          const tCal = profile.calculated_targets.calories || 1509;
+          filtered.sort((a, b) => 
+            Math.abs((a.macronutrients.calories || 0) - tCal * 0.25) - 
+            Math.abs((b.macronutrients.calories || 0) - tCal * 0.25)
+          );
 
-      // Make "MY MEALS" nav link work normally (since user is on it already)
-      document.querySelectorAll('.nav-btn').forEach(link => {
-        const href = link.getAttribute('href');
-        if (href === 'my-meals.html' && link.classList.contains('active')) {
-          link.addEventListener('click', (e) => e.preventDefault());
-        }
-      });
+          renderFoodGrid('search-results-grid', filtered);
+        });
+
+        document.querySelectorAll('.nav-btn').forEach(link => {
+          const href = link.getAttribute('href');
+          if (href === 'my-meals.html' && link.classList.contains('active')) {
+            link.addEventListener('click', (e) => e.preventDefault());
+          }
+        });
+      }
     });
   </script>
 </body>

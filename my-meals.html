@@ -90,7 +90,9 @@
       color: var(--orange-accent);
     }
 
-    /* .btn {
+    /* .btn-primary {
+      background: var(--orange-accent);
+      color: #FFFFFF;
       border: none;
       padding: 0.6rem 1.1rem;
       border-radius: 8px;
@@ -100,13 +102,8 @@
       letter-spacing: 0.05em;
       cursor: pointer;
       transition: all 0.2s;
-    } */
-
-    .btn-primary {
-      background: var(--orange-accent);
-      color: #FFFFFF;
       box-shadow: 0 4px 12px var(--orange-glow);
-    }
+    } */
 
     .btn-primary:hover {
       background: #c94d00;
@@ -1263,7 +1260,6 @@
 
       profile = userProfiles[currentUser];
 
-      // Calculate targets using the proper algorithm if not already calculated
       if (!profile.calculated_targets || !profile.goal_timeline) {
         const calculatedNutrition = calculateNutrition(profile);
         const goalTimeline = calculateGoalTimeline(profile);
@@ -1275,7 +1271,6 @@
         localStorage.setItem('mv_user_profiles', JSON.stringify(userProfiles));
       }
 
-      // Ensure mealPlannerParent exists
       if (!profile.mealPlannerParent) {
         profile.mealPlannerParent = {
           weeklyAdherence: [false, false, false, false, false, false, false],
@@ -1315,7 +1310,6 @@
       finderSearchInput = document.getElementById('finder-search-input');
     }
 
-    // FIXED: Now properly responds to all slider changes
     function recalculateGoalTimeline(changedKey) {
       if (!profile) return;
 
@@ -1323,7 +1317,6 @@
       const weightChangeTarget = parseFloat(profile.weight_change_target) || 0;
       const currentWeight = parseFloat(profile.weight) || 70;
 
-      // Handle maintenance case (no weight change target)
       if (weightChangeTarget === 0) {
         profile.goal_timeline = {
           targetWeightKg: currentWeight,
@@ -1340,42 +1333,30 @@
       let newCalories = parseInt(sldCal.value);
       let newDelta = parseInt(sldDelta.value);
 
-      // Determine which slider changed and update accordingly
       if (changedKey === 'calories') {
-        // Calorie slider changed → derive delta from TDEE
         if (weightChangeTarget < 0) {
-          // Losing weight: deficit = TDEE - calories
           newDelta = Math.round(tdee - newCalories);
         } else {
-          // Gaining weight: surplus = calories - TDEE
           newDelta = Math.round(newCalories - tdee);
         }
-        // Update delta slider to reflect new deficit
         sldDelta.value = newDelta;
         lblDelta.textContent = `${newDelta} kcal`;
         effectiveDelta = newDelta;
       } else if (changedKey === 'dailyDelta') {
-        // Delta slider changed → derive calories from TDEE
         effectiveDelta = newDelta;
         if (weightChangeTarget < 0) {
-          // Losing: calories = TDEE - delta
           newCalories = Math.round(tdee - newDelta);
         } else {
-          // Gaining: calories = TDEE + delta
           newCalories = Math.round(tdee + newDelta);
         }
-        // Enforce safety floors
         const minCal = (profile.gender || '').toLowerCase() === 'female' ? 1200 : 1500;
         newCalories = Math.max(newCalories, minCal);
-        // Update calorie slider
         sldCal.value = newCalories;
         lblCal.textContent = `${newCalories} kcal`;
       } else {
-        // Initial load or protein/carb/fat/fiber change — use current delta
         effectiveDelta = newDelta;
       }
 
-      // Sync all profile values from sliders
       profile.calculated_targets.calories = newCalories;
       profile.calculated_targets.protein_g = parseInt(sldPro.value);
       profile.calculated_targets.carbohydrates_g = parseInt(sldCarb.value);
@@ -1383,10 +1364,9 @@
       profile.calculated_targets.fiber_g = parseInt(sldFib.value);
       profile.calculated_targets.dailyDelta = newDelta;
 
-      // Calculate days to goal: total caloric need ÷ effective daily deficit
       const absWeightChange = Math.abs(weightChangeTarget);
       const totalCalorieNeed = absWeightChange * 7700;
-      const safeDelta = Math.max(50, Math.abs(effectiveDelta)); // Minimum 50 kcal to avoid infinite days
+      const safeDelta = Math.max(50, Math.abs(effectiveDelta));
       const daysToGoal = Math.max(7, Math.round(totalCalorieNeed / safeDelta));
 
       const goalDirection = weightChangeTarget < 0 ? "lose" : "gain";
@@ -1399,7 +1379,6 @@
         goalDirection: goalDirection
       };
 
-      // Update the goal timeline display
       goalText.textContent = `Target: ${profile.goal_timeline.targetWeightKg} kg (Change: ${absWeightChange} kg) in ${daysToGoal} Days`;
       saveState();
     }
@@ -1428,15 +1407,13 @@
       sldFib.value = targets.fiber_g; lblFib.textContent = `${targets.fiber_g} g`;
       sldDelta.value = targets.dailyDelta; lblDelta.textContent = `${targets.dailyDelta} kcal`;
 
-      // Initial goal timeline calculation
       recalculateGoalTimeline();
 
-      // Bind each slider with its key so we know which one changed
       const bindSlider = (elem, lbl, key, unit) => {
         elem.addEventListener('input', (e) => {
           const val = parseInt(e.target.value);
           lbl.textContent = `${val} ${unit}`;
-          recalculateGoalTimeline(key); // Pass which slider changed
+          recalculateGoalTimeline(key);
           renderMeals();
         });
       };
@@ -1723,47 +1700,128 @@
       renderMeals();
     };
 
-    function openMealFinder(mealId, mealName) {
-      activeTargetMealId = mealId;
-      document.getElementById('finder-modal-title').textContent = `ADD FOOD TO ${mealName}`;
-      finderModal.classList.remove('hidden');
-      finderSearchInput.value = '';
-      document.getElementById('search-results-section').style.display = 'none';
-      document.getElementById('recommendations-section').style.display = 'block';
+    // ========================================================================
+    // 3. SMART RECOMMENDATION ENGINE (NEW)
+    // ========================================================================
+    
+    function getRemainingMacros() {
+      let consumed = { calories: 0, protein_g: 0, carbohydrates_g: 0, fat_g: 0, fiber_g: 0 };
+      let consumedFoodIds = new Set();
+      
+      if (mealPlannerParent && mealPlannerParent.meals) {
+        mealPlannerParent.meals.forEach(meal => {
+          meal.foods.forEach(food => {
+            const m = food.macronutrients || {};
+            consumed.calories += m.calories || 0;
+            consumed.protein_g += m.protein_g || 0;
+            consumed.carbohydrates_g += m.carbohydrates_g || 0;
+            consumed.fat_g += m.fat_g || 0;
+            consumed.fiber_g += m.fiber_g || 0;
+            if (food.food_id) consumedFoodIds.add(food.food_id);
+          });
+        });
+      }
 
-      renderRecommendations(mealName);
+      const targets = profile.calculated_targets || { calories: 2000, protein_g: 150, carbohydrates_g: 200, fat_g: 60, fiber_g: 30 };
+      return {
+        remaining: {
+          calories: Math.max(0, (targets.calories || 0) - consumed.calories),
+          protein_g: Math.max(0, (targets.protein_g || 0) - consumed.protein_g),
+          carbohydrates_g: Math.max(0, (targets.carbohydrates_g || 0) - consumed.carbohydrates_g),
+          fat_g: Math.max(0, (targets.fat_g || 0) - consumed.fat_g),
+          fiber_g: Math.max(0, (targets.fiber_g || 0) - consumed.fiber_g)
+        },
+        consumedFoodIds
+      };
+    }
+
+    function getFoodRecommendationScore(food, remaining, mealName, consumedFoodIds, isVeg) {
+      // 1. Hide foods already eaten today for variety
+      if (consumedFoodIds.has(food.food_id)) return -999;
+      
+      // 2. Strict diet preference filter
+      if (isVeg && food.type !== "Vegetarian" && food.type !== "Vegan") return -999;
+
+      const macros = food.macronutrients || {};
+      const mCal = macros.calories || 0;
+      const mPro = macros.protein_g || 0;
+      const mCarb = macros.carbohydrates_g || 0;
+      const mFat = macros.fat_g || 0;
+      const mFib = macros.fiber_g || 0;
+
+      const remCal = Math.max(10, remaining.calories);
+      const remPro = Math.max(1, remaining.protein_g);
+      const remCarb = Math.max(1, remaining.carbohydrates_g);
+      const remFat = Math.max(1, remaining.fat_g);
+      const remFib = Math.max(1, remaining.fiber_g);
+
+      // Helper to score a macro ratio
+      const scoreMacro = (val, rem, weight, remOriginal) => {
+        if (remOriginal <= 0) {
+          // Already met: slight penalty to discourage unnecessary intake and promote hitting other missing macros
+          return - (val * 0.02 * weight); 
+        }
+        const ratio = val / rem;
+        if (ratio <= 1) {
+          return ratio * weight; // Linear reward for filling the gap up to 100%
+        } else {
+          // Overshooting a needed macro: reward up to 100%, then gently penalize excess
+          return Math.max(0, (1 - (ratio - 1) * 0.5)) * weight;
+        }
+      };
+
+      let score = 0;
+      // Protein is usually the hardest to hit, give it highest priority weight
+      score += scoreMacro(mPro, remPro, 3.0, remaining.protein_g);
+      // Fiber is highly valuable and often missed
+      score += scoreMacro(mFib, remFib, 1.5, remaining.fiber_g);
+      // Carbs and Fat balance the energy
+      score += scoreMacro(mCarb, remCarb, 1.0, remaining.carbohydrates_g);
+      score += scoreMacro(mFat, remFat, 1.0, remaining.fat_g);
+
+      // Calorie budget penalty: a single food shouldn't eat up too much of the remaining calorie budget
+      const calRatio = mCal / remCal;
+      if (calRatio > 0.5) {
+        score -= (calRatio - 0.5) * 3.0; // Heavy penalty if it consumes >50% of remaining calories
+      }
+
+      // Meal context bonus (improves relevance)
+      const mealLower = mealName.toLowerCase();
+      if (mealLower.includes("breakfast") && (food.category?.toLowerCase().includes("breakfast") || food.taste === "sweet")) {
+        score += 0.5;
+      } else if ((mealLower.includes("lunch") || mealLower.includes("dinner")) && food.category?.toLowerCase().match(/lunch|dinner|salad|curry|rice|roti|meal/)) {
+        score += 0.3;
+      }
+
+      return score;
     }
 
     function renderRecommendations(mealName) {
       if (!profile || !profile.calculated_targets) return;
+      
+      const { remaining, consumedFoodIds } = getRemainingMacros();
       const isVeg = (profile.diet_preference || "Vegetarian").toLowerCase().includes("veg") && 
                     !(profile.diet_preference || "").toLowerCase().includes("non");
-      const isBreakfast = mealName.toLowerCase().includes("breakfast");
 
-      let sorted = [...rawFoodDatabase].sort((a, b) => {
-        if (isVeg) {
-          if (a.type === "Vegetarian" && b.type !== "Vegetarian") return -1;
-          if (a.type !== "Vegetarian" && b.type === "Vegetarian") return 1;
-        }
+      let scoredFoods = rawFoodDatabase.map(food => ({
+        food,
+        score: getFoodRecommendationScore(food, remaining, mealName, consumedFoodIds, isVeg)
+      }));
 
-        if (isBreakfast) {
-          if (a.taste === "sweet" && b.taste !== "sweet") return -1;
-          if (a.taste !== "sweet" && b.taste === "sweet") return 1;
-        }
-
-        const tCal = profile.calculated_targets.calories || 1509;
-        const diffA = Math.abs((a.macronutrients.calories || 0) - (tCal * 0.25));
-        const diffB = Math.abs((b.macronutrients.calories || 0) - (tCal * 0.25));
-        return diffA - diffB;
-      });
-
-      const top15 = sorted.slice(0, 15);
-      renderFoodGrid('recommendations-grid', top15);
+      scoredFoods.sort((a, b) => b.score - a.score);
+      const topFoods = scoredFoods.filter(f => f.score > -999).slice(0, 15).map(f => f.food);
+      
+      renderFoodGrid('recommendations-grid', topFoods);
     }
 
     function renderFoodGrid(gridId, foodList) {
       const grid = document.getElementById(gridId);
       grid.innerHTML = '';
+
+      if (foodList.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-weight: 600;">No matching foods found that fit your remaining macros.</p>';
+        return;
+      }
 
       foodList.forEach(food => {
         const card = document.createElement('div');
@@ -1786,6 +1844,17 @@
       });
     }
 
+    function openMealFinder(mealId, mealName) {
+      activeTargetMealId = mealId;
+      document.getElementById('finder-modal-title').textContent = `ADD FOOD TO ${mealName}`;
+      finderModal.classList.remove('hidden');
+      finderSearchInput.value = '';
+      document.getElementById('search-results-section').style.display = 'none';
+      document.getElementById('recommendations-section').style.display = 'block';
+
+      renderRecommendations(mealName);
+    }
+
     window.addFoodToActiveMeal = function(foodId) {
       const foodObj = rawFoodDatabase.find(f => f.food_id === foodId);
       if (!foodObj || !activeTargetMealId) return;
@@ -1800,7 +1869,7 @@
     };
 
     // ========================================================================
-    // 3. MASTER INITIALIZATION
+    // 4. MASTER INITIALIZATION
     // ========================================================================
     document.addEventListener('DOMContentLoaded', async () => {
       cacheDomReferences();
@@ -1908,24 +1977,39 @@
           if (!query) {
             document.getElementById('search-results-section').style.display = 'none';
             document.getElementById('recommendations-section').style.display = 'block';
+            // Re-render recommendations in case macros changed while modal was open
+            if (activeTargetMealId) {
+               const currentMeal = mealPlannerParent.meals.find(m => m.id === activeTargetMealId);
+               if (currentMeal) renderRecommendations(currentMeal.name);
+            }
             return;
           }
 
           document.getElementById('search-results-section').style.display = 'block';
           document.getElementById('recommendations-section').style.display = 'none';
 
-          const filtered = rawFoodDatabase.filter(f => 
+          const { remaining, consumedFoodIds } = getRemainingMacros();
+          const isVeg = (profile.diet_preference || "Vegetarian").toLowerCase().includes("veg") && 
+                        !(profile.diet_preference || "").toLowerCase().includes("non");
+
+          // First filter by search query
+          let filtered = rawFoodDatabase.filter(f => 
             f.name.toLowerCase().includes(query) || 
             (f.category && f.category.toLowerCase().includes(query))
           );
 
-          const tCal = profile.calculated_targets.calories || 1509;
-          filtered.sort((a, b) => 
-            Math.abs((a.macronutrients.calories || 0) - tCal * 0.25) - 
-            Math.abs((b.macronutrients.calories || 0) - tCal * 0.25)
-          );
+          // Then score and sort the filtered results using the SAME smart algorithm
+          let scoredFiltered = filtered.map(food => ({
+            food,
+            score: getFoodRecommendationScore(food, remaining, "General", consumedFoodIds, isVeg)
+          }));
 
-          renderFoodGrid('search-results-grid', filtered);
+          scoredFiltered.sort((a, b) => b.score - a.score);
+          
+          // Show top 15 matching results that are actually good for the user's remaining macros
+          const topSearchFoods = scoredFiltered.filter(f => f.score > -999).slice(0, 15).map(f => f.food);
+          
+          renderFoodGrid('search-results-grid', topSearchFoods);
         });
 
         document.querySelectorAll('.nav-btn').forEach(link => {

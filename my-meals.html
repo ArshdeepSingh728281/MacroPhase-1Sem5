@@ -259,6 +259,12 @@
       border-radius: 16px;
       padding: 1.75rem;
       box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .overall-progress-card.limit-exceeded-card {
+      border-color: #EF4444;
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
     }
 
     .card-top-bar {
@@ -347,7 +353,7 @@
 
     .progress-track {
       width: 100%;
-      height: 6px;
+      height: 8px;
       background: #E2E8F0;
       border-radius: 9999px;
       overflow: hidden;
@@ -357,10 +363,29 @@
       height: 100%;
       background: var(--navy-main);
       border-radius: 9999px;
-      transition: width 0.3s ease;
+      transition: width 0.3s ease, background-color 0.3s ease;
     }
 
     .progress-fill.calories-fill { background: var(--orange-accent); }
+
+    @keyframes blink-red-bg {
+      0%, 100% { background-color: var(--orange-accent); }
+      50% { background-color: #EF4444; }
+    }
+
+    @keyframes blink-red-text {
+      0%, 100% { color: var(--navy-main); }
+      50% { color: #EF4444; }
+    }
+
+    .limit-exceeded-bar {
+      animation: blink-red-bg 1s infinite !important;
+    }
+
+    .limit-exceeded-text {
+      animation: blink-red-text 1s infinite !important;
+      font-weight: 900 !important;
+    }
 
     .meals-header-actions {
       display: flex;
@@ -496,7 +521,7 @@
       border-radius: 10px;
       margin-bottom: 0.65rem;
       border: 1px solid var(--border-color);
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
 
     .food-info-top {
@@ -540,6 +565,41 @@
       text-transform: uppercase;
     }
 
+    .food-qty-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #FFFFFF;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+
+    .qty-btn {
+      background: var(--input-bg);
+      border: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 4px;
+      font-weight: 900;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--navy-main);
+      transition: background 0.2s;
+    }
+
+    .qty-btn:hover { background: var(--border-color); }
+
+    .qty-display { 
+      font-weight: 800; 
+      font-size: 0.9rem; 
+      min-width: 28px; 
+      text-align: center; 
+    }
+
     .btn-remove-food {
       background: transparent;
       border: none;
@@ -547,6 +607,7 @@
       font-weight: 900;
       cursor: pointer;
       padding: 0.3rem 0.5rem;
+      font-size: 1.1rem;
     }
 
     .btn-open-search {
@@ -731,7 +792,7 @@
       background: #FFFFFF;
       border-radius: 20px;
       width: 100%;
-      max-width: 440px;
+      max-width: 500px;
       overflow: hidden;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       border: 2px solid var(--border-color);
@@ -951,7 +1012,7 @@
       </aside>
 
       <section class="parent-planner">
-        <div class="overall-progress-card">
+        <div class="overall-progress-card" id="progress-card">
           <div class="card-top-bar">
             <div>
               <h2 style="font-size: 1.2rem; font-weight: 900; text-transform: uppercase;">Daily Plan Completion</h2>
@@ -1002,6 +1063,7 @@
     </div>
   </main>
 
+  <!-- Finder Modal -->
   <div id="finder-modal" class="modal-overlay hidden">
     <div class="finder-modal">
       <div class="finder-header">
@@ -1027,6 +1089,36 @@
     </div>
   </div>
 
+  <!-- Calorie Warning Modal -->
+  <div id="calorie-warning-modal" class="modal-overlay hidden">
+    <div class="auth-modal-box">
+      <div class="auth-modal-header" style="background: #EF4444;">
+        <h3>⚠️ CALORIE LIMIT EXCEEDED</h3>
+        <button class="close-modal-btn" id="close-calorie-warning">&times;</button>
+      </div>
+      <div class="auth-modal-body">
+        <p class="auth-subtitle" id="calorie-warning-message" style="text-align: center; font-size: 0.9rem; line-height: 1.5;"></p>
+        
+        <div style="background: var(--input-bg); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border-color);">
+          <h4 style="font-size: 0.75rem; font-weight: 900; text-transform: uppercase; margin-bottom: 0.5rem; color: var(--navy-main);">💡 Suggestion: Remove to make room</h4>
+          <div id="suggested-removal" style="font-size: 0.85rem; font-weight: 600; color: var(--navy-muted);"></div>
+        </div>
+
+        <div style="background: var(--input-bg); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid var(--border-color);">
+          <h4 style="font-size: 0.75rem; font-weight: 900; text-transform: uppercase; margin-bottom: 0.5rem; color: var(--navy-main);">🔄 Better Alternatives (Fit your budget)</h4>
+          <div id="suggested-alternatives" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+          <button id="btn-cancel-add" class="auth-submit" style="background: var(--text-muted); flex: 1;">Cancel</button>
+          <button id="btn-force-add" class="auth-submit" style="background: var(--orange-accent); flex: 1;">Add Anyway</button>
+        </div>
+        <button id="btn-swap-add" class="auth-submit" style="background: var(--navy-main); width: 100%; margin-top: 0.75rem; display: none;">Remove Suggested & Add This</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Modal -->
   <div id="auth-modal" class="modal-overlay hidden">
     <div class="auth-modal-box">
       <div class="auth-modal-header">
@@ -1058,7 +1150,7 @@
   <script src="js/data.js"></script>
   <script src="js/calculator.js"></script>
   <script>
-    // Fallback calculator functions in case calculator.js fails to load
+    // Fallback calculator functions
     if (typeof getEnergyMetrics === 'undefined') {
       window.getEnergyMetrics = function(user) {
         const weight = parseFloat(user.weight) || 70;
@@ -1086,8 +1178,7 @@
         const dailyCalorieDelta = targetChange < 0 ? 500 : 300;
         const daysToGoal = Math.round(totalCalorieNeed / dailyCalorieDelta);
         const goalDirection = targetChange < 0 ? "lose" : "gain";
-        const targetWeight = currentWeight + targetChange;
-        return { targetWeightKg: parseFloat(targetWeight.toFixed(1)), bodyWeightChangeKg: absWeightChange, daysToGoal: daysToGoal, goalDirection: goalDirection };
+        return { targetWeightKg: parseFloat((currentWeight + targetChange).toFixed(1)), bodyWeightChangeKg: absWeightChange, daysToGoal: daysToGoal, goalDirection: goalDirection };
       };
     }
 
@@ -1109,14 +1200,8 @@
     // ========================================================================
     let currentUser = localStorage.getItem('mv_user') || null;
 
-    function getUsers() {
-      return JSON.parse(localStorage.getItem('mv_registered_users')) || {};
-    }
-
-    function saveUsers(users) {
-      localStorage.setItem('mv_registered_users', JSON.stringify(users));
-    }
-
+    function getUsers() { return JSON.parse(localStorage.getItem('mv_registered_users')) || {}; }
+    function saveUsers(users) { localStorage.setItem('mv_registered_users', JSON.stringify(users)); }
     function getUserProfile(username) {
       const profiles = JSON.parse(localStorage.getItem('mv_user_profiles')) || {};
       return profiles[username] || null;
@@ -1125,13 +1210,11 @@
     function updateAuthUI() {
       const userDisplay = document.getElementById('user-display');
       const authBtn = document.getElementById('auth-btn');
-
       if (currentUser) {
         if (userDisplay) {
           userDisplay.textContent = `USER: ${currentUser.toUpperCase()}`;
           userDisplay.classList.remove('hidden');
           userDisplay.style.cursor = 'pointer';
-          userDisplay.title = 'Edit Questionnaire Profile';
         }
         if (authBtn) authBtn.textContent = 'LOGOUT';
       } else {
@@ -1140,25 +1223,15 @@
       }
     }
 
-    function showAuthModal() {
-      const modal = document.getElementById('auth-modal');
-      if (modal) modal.classList.remove('hidden');
-    }
-
-    function hideAuthModal() {
-      const modal = document.getElementById('auth-modal');
-      if (modal) modal.classList.add('hidden');
-    }
+    function showAuthModal() { document.getElementById('auth-modal').classList.remove('hidden'); }
+    function hideAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
 
     function login(username) {
       currentUser = username;
       localStorage.setItem('mv_user', username);
       updateAuthUI();
-
       const profile = getUserProfile(username);
-      if (!profile || !profile.onboarding_completed) {
-        window.location.href = 'questionnaire.html';
-      }
+      if (!profile || !profile.onboarding_completed) window.location.href = 'questionnaire.html';
     }
 
     function logout() {
@@ -1170,11 +1243,7 @@
 
     function requireAuth(e, targetUrl) {
       e.preventDefault();
-      if (!currentUser) {
-        showAuthModal();
-        return;
-      }
-
+      if (!currentUser) { showAuthModal(); return; }
       const profile = getUserProfile(currentUser);
       if (!profile || !profile.onboarding_completed) {
         alert('Please complete the setup questionnaire first!');
@@ -1192,40 +1261,15 @@
     async function fetchFoodDatabase() {
       try {
         const response = await fetch('./data.json');
-        if (response.ok) {
-          rawFoodDatabase = await response.json();
-        } else {
-          throw new Error("HTTP Error loading data.json");
-        }
+        if (response.ok) rawFoodDatabase = await response.json();
+        else throw new Error("HTTP Error");
       } catch (err) {
         if (typeof foodData !== 'undefined' && Array.isArray(foodData)) {
           rawFoodDatabase = foodData;
         } else {
           rawFoodDatabase = [
-            {
-              food_id: "food_000363",
-              name: "Paneer Salad",
-              category: "Salad",
-              type: "Vegetarian",
-              taste: "savory",
-              serving_size: { amount: 200, unit: "g", description: "1 standard bowl" },
-              macronutrients: { calories: 245, protein_g: 16, carbohydrates_g: 10, fat_g: 17, fiber_g: 3 },
-              meal_type: ["Lunch", "Dinner"],
-              diet_tags: ["Vegetarian", "High Protein"],
-              image_url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&q=80"
-            },
-            {
-              food_id: "food_000364",
-              name: "Oatmeal Bowl",
-              category: "Breakfast",
-              type: "Vegetarian",
-              taste: "sweet",
-              serving_size: { amount: 250, unit: "g", description: "1 bowl" },
-              macronutrients: { calories: 320, protein_g: 12, carbohydrates_g: 55, fat_g: 8, fiber_g: 7 },
-              meal_type: ["Breakfast"],
-              diet_tags: ["Vegetarian", "High Fiber"],
-              image_url: "https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=300&q=80"
-            }
+            { food_id: "food_000363", name: "Paneer Salad", category: "Salad", type: "Vegetarian", taste: "savory", serving_size: { amount: 200, unit: "g", description: "1 bowl" }, macronutrients: { calories: 245, protein_g: 16, carbohydrates_g: 10, fat_g: 17, fiber_g: 3 }, meal_type: ["Lunch", "Dinner"], diet_tags: ["Vegetarian", "High Protein"], image_url: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=300&q=80" },
+            { food_id: "food_000364", name: "Oatmeal Bowl", category: "Breakfast", type: "Vegetarian", taste: "sweet", serving_size: { amount: 250, unit: "g", description: "1 bowl" }, macronutrients: { calories: 320, protein_g: 12, carbohydrates_g: 55, fat_g: 8, fiber_g: 7 }, meal_type: ["Breakfast"], diet_tags: ["Vegetarian", "High Fiber"], image_url: "https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=300&q=80" }
           ];
         }
       }
@@ -1238,50 +1282,26 @@
 
     function loadMealPlannerState() {
       if (!currentUser) return;
-
       let userProfiles = JSON.parse(localStorage.getItem('mv_user_profiles')) || {};
-
       if (!userProfiles[currentUser]) {
-        userProfiles[currentUser] = {
-          age: "25",
-          gender: "Male",
-          height: "175",
-          weight: "70",
-          activity_level: "Sedentary",
-          diet_preference: "Vegetarian",
-          daily_steps: "3000–7000",
-          weight_change_target: "-5",
-          onboarding_completed: false
-        };
+        userProfiles[currentUser] = { age: "25", gender: "Male", height: "175", weight: "70", activity_level: "Sedentary", diet_preference: "Vegetarian", daily_steps: "3000–7000", weight_change_target: "-5", onboarding_completed: false };
         localStorage.setItem('mv_user_profiles', JSON.stringify(userProfiles));
         window.location.href = 'questionnaire.html';
         return;
       }
-
       profile = userProfiles[currentUser];
-
       if (!profile.calculated_targets || !profile.goal_timeline) {
-        const calculatedNutrition = calculateNutrition(profile);
-        const goalTimeline = calculateGoalTimeline(profile);
-        
-        profile.calculated_targets = calculatedNutrition;
-        profile.goal_timeline = goalTimeline;
-        
+        profile.calculated_targets = calculateNutrition(profile);
+        profile.goal_timeline = calculateGoalTimeline(profile);
         userProfiles[currentUser] = profile;
         localStorage.setItem('mv_user_profiles', JSON.stringify(userProfiles));
       }
-
       if (!profile.mealPlannerParent) {
         profile.mealPlannerParent = {
           weeklyAdherence: [false, false, false, false, false, false, false],
-          meals: [
-            { id: "m1", name: "Breakfast", foods: [] },
-            { id: "m2", name: "Lunch", foods: [] },
-            { id: "m3", name: "Dinner", foods: [] }
-          ]
+          meals: [ { id: "m1", name: "Breakfast", foods: [] }, { id: "m2", name: "Lunch", foods: [] }, { id: "m3", name: "Dinner", foods: [] } ]
         };
       }
-
       mealPlannerParent = profile.mealPlannerParent;
     }
 
@@ -1290,20 +1310,12 @@
     let goalText, mealsContainer, finderModal, finderSearchInput;
 
     function cacheDomReferences() {
-      sldCal = document.getElementById('sld-calories');
-      sldPro = document.getElementById('sld-protein');
-      sldCarb = document.getElementById('sld-carbs');
-      sldFat = document.getElementById('sld-fat');
-      sldFib = document.getElementById('sld-fiber');
-      sldDelta = document.getElementById('sld-delta');
-
-      lblCal = document.getElementById('lbl-calories');
-      lblPro = document.getElementById('lbl-protein');
-      lblCarb = document.getElementById('lbl-carbs');
-      lblFat = document.getElementById('lbl-fat');
-      lblFib = document.getElementById('lbl-fiber');
-      lblDelta = document.getElementById('lbl-delta');
-
+      sldCal = document.getElementById('sld-calories'); sldPro = document.getElementById('sld-protein');
+      sldCarb = document.getElementById('sld-carbs'); sldFat = document.getElementById('sld-fat');
+      sldFib = document.getElementById('sld-fiber'); sldDelta = document.getElementById('sld-delta');
+      lblCal = document.getElementById('lbl-calories'); lblPro = document.getElementById('lbl-protein');
+      lblCarb = document.getElementById('lbl-carbs'); lblFat = document.getElementById('lbl-fat');
+      lblFib = document.getElementById('lbl-fiber'); lblDelta = document.getElementById('lbl-delta');
       goalText = document.getElementById('goal-timeline-text');
       mealsContainer = document.getElementById('meals-container');
       finderModal = document.getElementById('finder-modal');
@@ -1312,50 +1324,27 @@
 
     function recalculateGoalTimeline(changedKey) {
       if (!profile) return;
-
       const { tdee } = getEnergyMetrics(profile);
       const weightChangeTarget = parseFloat(profile.weight_change_target) || 0;
       const currentWeight = parseFloat(profile.weight) || 70;
 
       if (weightChangeTarget === 0) {
-        profile.goal_timeline = {
-          targetWeightKg: currentWeight,
-          bodyWeightChangeKg: 0,
-          daysToGoal: 0,
-          goalDirection: "maintain"
-        };
+        profile.goal_timeline = { targetWeightKg: currentWeight, bodyWeightChangeKg: 0, daysToGoal: 0, goalDirection: "maintain" };
         goalText.textContent = `Maintaining at ${currentWeight} kg`;
-        saveState();
-        return;
+        saveState(); return;
       }
 
-      let effectiveDelta;
-      let newCalories = parseInt(sldCal.value);
-      let newDelta = parseInt(sldDelta.value);
-
+      let effectiveDelta, newCalories = parseInt(sldCal.value), newDelta = parseInt(sldDelta.value);
       if (changedKey === 'calories') {
-        if (weightChangeTarget < 0) {
-          newDelta = Math.round(tdee - newCalories);
-        } else {
-          newDelta = Math.round(newCalories - tdee);
-        }
-        sldDelta.value = newDelta;
-        lblDelta.textContent = `${newDelta} kcal`;
-        effectiveDelta = newDelta;
+        newDelta = Math.round(weightChangeTarget < 0 ? tdee - newCalories : newCalories - tdee);
+        sldDelta.value = newDelta; lblDelta.textContent = `${newDelta} kcal`; effectiveDelta = newDelta;
       } else if (changedKey === 'dailyDelta') {
         effectiveDelta = newDelta;
-        if (weightChangeTarget < 0) {
-          newCalories = Math.round(tdee - newDelta);
-        } else {
-          newCalories = Math.round(tdee + newDelta);
-        }
+        newCalories = Math.round(weightChangeTarget < 0 ? tdee - newDelta : tdee + newDelta);
         const minCal = (profile.gender || '').toLowerCase() === 'female' ? 1200 : 1500;
         newCalories = Math.max(newCalories, minCal);
-        sldCal.value = newCalories;
-        lblCal.textContent = `${newCalories} kcal`;
-      } else {
-        effectiveDelta = newDelta;
-      }
+        sldCal.value = newCalories; lblCal.textContent = `${newCalories} kcal`;
+      } else { effectiveDelta = newDelta; }
 
       profile.calculated_targets.calories = newCalories;
       profile.calculated_targets.protein_g = parseInt(sldPro.value);
@@ -1365,20 +1354,9 @@
       profile.calculated_targets.dailyDelta = newDelta;
 
       const absWeightChange = Math.abs(weightChangeTarget);
-      const totalCalorieNeed = absWeightChange * 7700;
       const safeDelta = Math.max(50, Math.abs(effectiveDelta));
-      const daysToGoal = Math.max(7, Math.round(totalCalorieNeed / safeDelta));
-
-      const goalDirection = weightChangeTarget < 0 ? "lose" : "gain";
-      const targetWeight = currentWeight + weightChangeTarget;
-
-      profile.goal_timeline = {
-        targetWeightKg: parseFloat(targetWeight.toFixed(1)),
-        bodyWeightChangeKg: absWeightChange,
-        daysToGoal: daysToGoal,
-        goalDirection: goalDirection
-      };
-
+      const daysToGoal = Math.max(7, Math.round((absWeightChange * 7700) / safeDelta));
+      profile.goal_timeline = { targetWeightKg: parseFloat((currentWeight + weightChangeTarget).toFixed(1)), bodyWeightChangeKg: absWeightChange, daysToGoal: daysToGoal, goalDirection: weightChangeTarget < 0 ? "lose" : "gain" };
       goalText.textContent = `Target: ${profile.goal_timeline.targetWeightKg} kg (Change: ${absWeightChange} kg) in ${daysToGoal} Days`;
       saveState();
     }
@@ -1394,30 +1372,25 @@
 
     function initSliders() {
       if (!profile || !profile.calculated_targets) return;
-      const targets = profile.calculated_targets;
-      
+      const t = profile.calculated_targets;
       document.getElementById('badge-gender').textContent = profile.gender || "Male";
       document.getElementById('badge-diet').textContent = profile.diet_preference || "Vegetarian";
       document.getElementById('badge-steps').textContent = `${profile.daily_steps || '3000-7000'} Steps`;
 
-      sldCal.value = targets.calories; lblCal.textContent = `${targets.calories} kcal`;
-      sldPro.value = targets.protein_g; lblPro.textContent = `${targets.protein_g} g`;
-      sldCarb.value = targets.carbohydrates_g; lblCarb.textContent = `${targets.carbohydrates_g} g`;
-      sldFat.value = targets.fat_g; lblFat.textContent = `${targets.fat_g} g`;
-      sldFib.value = targets.fiber_g; lblFib.textContent = `${targets.fiber_g} g`;
-      sldDelta.value = targets.dailyDelta; lblDelta.textContent = `${targets.dailyDelta} kcal`;
+      sldCal.value = t.calories; lblCal.textContent = `${t.calories} kcal`;
+      sldPro.value = t.protein_g; lblPro.textContent = `${t.protein_g} g`;
+      sldCarb.value = t.carbohydrates_g; lblCarb.textContent = `${t.carbohydrates_g} g`;
+      sldFat.value = t.fat_g; lblFat.textContent = `${t.fat_g} g`;
+      sldFib.value = t.fiber_g; lblFib.textContent = `${t.fiber_g} g`;
+      sldDelta.value = t.dailyDelta; lblDelta.textContent = `${t.dailyDelta} kcal`;
 
       recalculateGoalTimeline();
-
       const bindSlider = (elem, lbl, key, unit) => {
         elem.addEventListener('input', (e) => {
-          const val = parseInt(e.target.value);
-          lbl.textContent = `${val} ${unit}`;
-          recalculateGoalTimeline(key);
-          renderMeals();
+          lbl.textContent = `${parseInt(e.target.value)} ${unit}`;
+          recalculateGoalTimeline(key); renderMeals();
         });
       };
-
       bindSlider(sldCal, lblCal, 'calories', 'kcal');
       bindSlider(sldPro, lblPro, 'protein_g', 'g');
       bindSlider(sldCarb, lblCarb, 'carbohydrates_g', 'g');
@@ -1431,39 +1404,26 @@
       const trackerContainer = document.getElementById('week-tracker-boxes');
       const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
       trackerContainer.innerHTML = '';
-
       let checkedCount = 0;
-
       days.forEach((day, idx) => {
         const isChecked = mealPlannerParent.weeklyAdherence[idx];
         if (isChecked) checkedCount++;
-
         const box = document.createElement('div');
         box.className = `day-box ${isChecked ? 'completed' : ''}`;
-        box.innerHTML = `
-          <span class="day-name">${day}</span>
-          <div class="day-check">✓</div>
-        `;
-
+        box.innerHTML = `<span class="day-name">${day}</span><div class="day-check">✓</div>`;
         box.addEventListener('click', () => {
           mealPlannerParent.weeklyAdherence[idx] = !mealPlannerParent.weeklyAdherence[idx];
-          saveState();
-          renderWeekTracker();
+          saveState(); renderWeekTracker();
         });
-
         trackerContainer.appendChild(box);
       });
-
-      const pct = Math.round((checkedCount / 7) * 100);
-      document.getElementById('weekly-adherence-badge').textContent = 
-        `Weekly Adherence: ${checkedCount} / 7 Days Followed (${pct}%)`;
+      document.getElementById('weekly-adherence-badge').textContent = `Weekly Adherence: ${checkedCount} / 7 Days Followed (${Math.round((checkedCount / 7) * 100)}%)`;
     }
 
     function generateMacroBarsHTML(macronutrients) {
       if (!profile || !profile.calculated_targets) return '';
       const t = profile.calculated_targets;
       const m = macronutrients;
-
       const pCal = Math.min(100, Math.round(((m.calories || 0) / t.calories) * 100));
       const pPro = Math.min(100, Math.round(((m.protein_g || 0) / t.protein_g) * 100));
       const pCarb = Math.min(100, Math.round(((m.carbohydrates_g || 0) / t.carbohydrates_g) * 100));
@@ -1472,146 +1432,99 @@
 
       return `
         <div class="macro-bars-grid">
-          <div class="bar-item">
-            <div class="bar-label"><span>Cal</span><span>${m.calories || 0} (${pCal}%)</span></div>
-            <div class="progress-track"><div class="progress-fill calories-fill" style="width: ${pCal}%;"></div></div>
-          </div>
-          <div class="bar-item">
-            <div class="bar-label"><span>Pro</span><span>${m.protein_g || 0}g (${pPro}%)</span></div>
-            <div class="progress-track"><div class="progress-fill" style="width: ${pPro}%;"></div></div>
-          </div>
-          <div class="bar-item">
-            <div class="bar-label"><span>Carb</span><span>${m.carbohydrates_g || 0}g (${pCarb}%)</span></div>
-            <div class="progress-track"><div class="progress-fill" style="width: ${pCarb}%;"></div></div>
-          </div>
-          <div class="bar-item">
-            <div class="bar-label"><span>Fat</span><span>${m.fat_g || 0}g (${pFat}%)</span></div>
-            <div class="progress-track"><div class="progress-fill" style="width: ${pFat}%;"></div></div>
-          </div>
-          <div class="bar-item">
-            <div class="bar-label"><span>Fib</span><span>${m.fiber_g || 0}g (${pFib}%)</span></div>
-            <div class="progress-track"><div class="progress-fill" style="width: ${pFib}%;"></div></div>
-          </div>
-        </div>
-      `;
+          <div class="bar-item"><div class="bar-label"><span>Cal</span><span>${m.calories || 0} (${pCal}%)</span></div><div class="progress-track"><div class="progress-fill calories-fill" style="width: ${pCal}%;"></div></div></div>
+          <div class="bar-item"><div class="bar-label"><span>Pro</span><span>${m.protein_g || 0}g (${pPro}%)</span></div><div class="progress-track"><div class="progress-fill" style="width: ${pPro}%;"></div></div></div>
+          <div class="bar-item"><div class="bar-label"><span>Carb</span><span>${m.carbohydrates_g || 0}g (${pCarb}%)</span></div><div class="progress-track"><div class="progress-fill" style="width: ${pCarb}%;"></div></div></div>
+          <div class="bar-item"><div class="bar-label"><span>Fat</span><span>${m.fat_g || 0}g (${pFat}%)</span></div><div class="progress-track"><div class="progress-fill" style="width: ${pFat}%;"></div></div></div>
+          <div class="bar-item"><div class="bar-label"><span>Fib</span><span>${m.fiber_g || 0}g (${pFib}%)</span></div><div class="progress-track"><div class="progress-fill" style="width: ${pFib}%;"></div></div></div>
+        </div>`;
+    }
+
+    function getConsumedMacros() {
+      let consumed = { calories: 0, protein_g: 0, carbohydrates_g: 0, fat_g: 0, fiber_g: 0 };
+      let consumedFoodIds = new Set();
+      if (mealPlannerParent && mealPlannerParent.meals) {
+        mealPlannerParent.meals.forEach(meal => {
+          meal.foods.forEach(item => {
+            const food = item.food || item; // backward compatibility
+            const qty = item.quantity || 1;
+            const m = food.macronutrients || {};
+            consumed.calories += (m.calories || 0) * qty;
+            consumed.protein_g += (m.protein_g || 0) * qty;
+            consumed.carbohydrates_g += (m.carbohydrates_g || 0) * qty;
+            consumed.fat_g += (m.fat_g || 0) * qty;
+            consumed.fiber_g += (m.fiber_g || 0) * qty;
+            if (food.food_id) consumedFoodIds.add(food.food_id);
+          });
+        });
+      }
+      return { consumed, consumedFoodIds };
     }
 
     function renderProgressBars() {
       if (!mealPlannerParent || !profile || !profile.calculated_targets) return;
-      let totals = { calories: 0, protein_g: 0, carbohydrates_g: 0, fat_g: 0, fiber_g: 0 };
-
-      mealPlannerParent.meals.forEach(m => {
-        m.foods.forEach(f => {
-          const mcr = f.macronutrients;
-          totals.calories += mcr.calories || 0;
-          totals.protein_g += mcr.protein_g || 0;
-          totals.carbohydrates_g += mcr.carbohydrates_g || 0;
-          totals.fat_g += mcr.fat_g || 0;
-          totals.fiber_g += mcr.fiber_g || 0;
-        });
-      });
-
+      const { consumed } = getConsumedMacros();
       const t = profile.calculated_targets;
+      let isAnyExceeded = false;
 
       const setBar = (valId, barId, current, target, unit = 'g') => {
-        document.getElementById(valId).textContent = `${current} / ${target}${unit}`;
+        const valEl = document.getElementById(valId);
+        const barEl = document.getElementById(barId);
+        valEl.textContent = `${Math.round(current * 10) / 10} / ${target}${unit}`;
         const pct = Math.min(100, Math.round((current / (target || 1)) * 100));
-        document.getElementById(barId).style.width = `${pct}%`;
+        barEl.style.width = `${pct}%`;
+        
+        if (current > target) {
+          barEl.classList.add('limit-exceeded-bar');
+          valEl.classList.add('limit-exceeded-text');
+          isAnyExceeded = true;
+        } else {
+          barEl.classList.remove('limit-exceeded-bar');
+          valEl.classList.remove('limit-exceeded-text');
+        }
       };
 
-      setBar('prog-val-cal', 'prog-bar-cal', totals.calories, t.calories, '');
-      setBar('prog-val-pro', 'prog-bar-pro', totals.protein_g, t.protein_g);
-      setBar('prog-val-carb', 'prog-bar-carb', totals.carbohydrates_g, t.carbohydrates_g);
-      setBar('prog-val-fat', 'prog-bar-fat', totals.fat_g, t.fat_g);
-      setBar('prog-val-fib', 'prog-bar-fib', totals.fiber_g, t.fiber_g);
+      setBar('prog-val-cal', 'prog-bar-cal', consumed.calories, t.calories, '');
+      setBar('prog-val-pro', 'prog-bar-pro', consumed.protein_g, t.protein_g);
+      setBar('prog-val-carb', 'prog-bar-carb', consumed.carbohydrates_g, t.carbohydrates_g);
+      setBar('prog-val-fat', 'prog-bar-fat', consumed.fat_g, t.fat_g);
+      setBar('prog-val-fib', 'prog-bar-fib', consumed.fiber_g, t.fiber_g);
 
-      document.getElementById('completion-subtitle').textContent = 
-        `${mealPlannerParent.meals.length} Daily Meal Slots Configured`;
+      const progressCard = document.getElementById('progress-card');
+      if (isAnyExceeded) progressCard.classList.add('limit-exceeded-card');
+      else progressCard.classList.remove('limit-exceeded-card');
+
+      document.getElementById('completion-subtitle').textContent = `${mealPlannerParent.meals.length} Daily Meal Slots Configured`;
     }
 
     window.editMealName = function(mealIdx, titleElement) {
       const meal = mealPlannerParent.meals[mealIdx];
-      const currentName = meal.name;
-
       const input = document.createElement('input');
-      input.type = 'text';
-      input.className = 'meal-name-input';
-      input.value = currentName;
-
-      titleElement.replaceWith(input);
-      input.focus();
-      input.select();
-
+      input.type = 'text'; input.className = 'meal-name-input'; input.value = meal.name;
+      titleElement.replaceWith(input); input.focus(); input.select();
       const saveName = () => {
-        const newName = input.value.trim() || currentName;
-        mealPlannerParent.meals[mealIdx].name = newName;
-        saveState();
-        renderMeals();
+        mealPlannerParent.meals[mealIdx].name = input.value.trim() || meal.name;
+        saveState(); renderMeals();
       };
-
       input.addEventListener('blur', saveName);
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          input.blur();
-        } else if (e.key === 'Escape') {
-          input.value = currentName;
-          input.blur();
-        }
-      });
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); input.blur(); } else if (e.key === 'Escape') { input.value = meal.name; input.blur(); } });
     };
 
-    function handleDragStart(e) {
-      draggedMealIndex = parseInt(this.dataset.mealIndex);
-      this.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', draggedMealIndex);
-    }
-
-    function handleDragOver(e) {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-    }
-
-    function handleDragEnter(e) {
-      e.preventDefault();
-      const targetIdx = parseInt(this.dataset.mealIndex);
-      if (draggedMealIndex !== null && targetIdx !== draggedMealIndex) {
-        this.classList.add('drag-over');
-      }
-    }
-
-    function handleDragLeave(e) {
-      const rect = this.getBoundingClientRect();
-      if (
-        e.clientX < rect.left || e.clientX >= rect.right ||
-        e.clientY < rect.top || e.clientY >= rect.bottom
-      ) {
-        this.classList.remove('drag-over');
-      }
-    }
-
+    function handleDragStart(e) { draggedMealIndex = parseInt(this.dataset.mealIndex); this.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', draggedMealIndex); }
+    function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+    function handleDragEnter(e) { e.preventDefault(); if (draggedMealIndex !== null && parseInt(this.dataset.mealIndex) !== draggedMealIndex) this.classList.add('drag-over'); }
+    function handleDragLeave(e) { const rect = this.getBoundingClientRect(); if (e.clientX < rect.left || e.clientX >= rect.right || e.clientY < rect.top || e.clientY >= rect.bottom) this.classList.remove('drag-over'); }
     function handleDrop(e) {
-      e.preventDefault();
-      this.classList.remove('drag-over');
-
+      e.preventDefault(); this.classList.remove('drag-over');
       const targetIndex = parseInt(this.dataset.mealIndex);
       if (draggedMealIndex !== null && draggedMealIndex !== targetIndex) {
         const [draggedMeal] = mealPlannerParent.meals.splice(draggedMealIndex, 1);
         mealPlannerParent.meals.splice(targetIndex, 0, draggedMeal);
-        saveState();
-        renderMeals();
+        saveState(); renderMeals();
       }
       draggedMealIndex = null;
     }
-
-    function handleDragEnd() {
-      this.classList.remove('dragging');
-      document.querySelectorAll('.meal-card.drag-over').forEach(el => {
-        el.classList.remove('drag-over');
-      });
-      draggedMealIndex = null;
-    }
+    function handleDragEnd() { this.classList.remove('dragging'); document.querySelectorAll('.meal-card.drag-over').forEach(el => el.classList.remove('drag-over')); draggedMealIndex = null; }
 
     function renderMeals() {
       if (!mealPlannerParent || !mealsContainer) return;
@@ -1619,16 +1532,24 @@
 
       mealPlannerParent.meals.forEach((meal, mealIdx) => {
         const card = document.createElement('div');
-        card.className = 'meal-card';
-        card.draggable = true;
-        card.dataset.mealIndex = mealIdx;
-
+        card.className = 'meal-card'; card.draggable = true; card.dataset.mealIndex = mealIdx;
         let foodRowsHtml = '';
 
         if (meal.foods.length === 0) {
           foodRowsHtml = `<p style="font-size: 0.85rem; color: var(--text-muted); font-weight:600; padding: 0.5rem 0;">No items added to this meal slot yet.</p>`;
         } else {
-          meal.foods.forEach((food, foodIdx) => {
+          meal.foods.forEach((item, foodIdx) => {
+            const food = item.food || item;
+            const qty = item.quantity || 1;
+            const mcr = food.macronutrients;
+            const scaledMacros = {
+              calories: Math.round((mcr.calories || 0) * qty),
+              protein_g: Math.round((mcr.protein_g || 0) * qty * 10) / 10,
+              carbohydrates_g: Math.round((mcr.carbohydrates_g || 0) * qty * 10) / 10,
+              fat_g: Math.round((mcr.fat_g || 0) * qty * 10) / 10,
+              fiber_g: Math.round((mcr.fiber_g || 0) * qty * 10) / 10
+            };
+
             foodRowsHtml += `
               <div class="food-item-row">
                 <div class="food-info-top">
@@ -1642,9 +1563,16 @@
                       </div>
                     </div>
                   </div>
-                  <button class="btn-remove-food" onclick="removeFoodFromMeal(${mealIdx}, ${foodIdx})">✕ REMOVE</button>
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div class="food-qty-controls">
+                      <button class="qty-btn" onclick="changeQuantity(${mealIdx}, ${foodIdx}, -0.5)">−</button>
+                      <span class="qty-display">${qty}</span>
+                      <button class="qty-btn" onclick="changeQuantity(${mealIdx}, ${foodIdx}, 0.5)">+</button>
+                    </div>
+                    <button class="btn-remove-food" onclick="removeFoodFromMeal(${mealIdx}, ${foodIdx})">✕</button>
+                  </div>
                 </div>
-                ${generateMacroBarsHTML(food.macronutrients)}
+                ${generateMacroBarsHTML(scaledMacros)}
               </div>
             `;
           });
@@ -1673,55 +1601,41 @@
         const titleEl = card.querySelector('.meal-title');
         const renameBtn = card.querySelector('.btn-rename-meal');
         titleEl.addEventListener('click', () => editMealName(mealIdx, titleEl));
-        renameBtn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          editMealName(mealIdx, titleEl);
-        });
+        renameBtn.addEventListener('click', (e) => { e.stopPropagation(); editMealName(mealIdx, titleEl); });
 
         mealsContainer.appendChild(card);
       });
-
       renderProgressBars();
     }
 
+    window.changeQuantity = function(mealIdx, foodIdx, delta) {
+      const item = mealPlannerParent.meals[mealIdx].foods[foodIdx];
+      let newQty = Math.round(((item.quantity || 1) + delta) * 10) / 10;
+      if (newQty <= 0) {
+        removeFoodFromMeal(mealIdx, foodIdx);
+      } else {
+        item.quantity = newQty;
+        saveState();
+        renderMeals();
+      }
+    };
+
     window.removeFoodFromMeal = function(mealIdx, foodIdx) {
       mealPlannerParent.meals[mealIdx].foods.splice(foodIdx, 1);
-      saveState();
-      renderMeals();
+      saveState(); renderMeals();
     };
 
     window.removeMealSlot = function(mealIdx) {
-      if (mealPlannerParent.meals.length <= 1) {
-        alert("You must keep at least one meal slot.");
-        return;
-      }
+      if (mealPlannerParent.meals.length <= 1) { alert("You must keep at least one meal slot."); return; }
       mealPlannerParent.meals.splice(mealIdx, 1);
-      saveState();
-      renderMeals();
+      saveState(); renderMeals();
     };
 
     // ========================================================================
-    // 3. SMART RECOMMENDATION ENGINE (NEW)
+    // 3. SMART RECOMMENDATION & WARNING ENGINE
     // ========================================================================
-    
     function getRemainingMacros() {
-      let consumed = { calories: 0, protein_g: 0, carbohydrates_g: 0, fat_g: 0, fiber_g: 0 };
-      let consumedFoodIds = new Set();
-      
-      if (mealPlannerParent && mealPlannerParent.meals) {
-        mealPlannerParent.meals.forEach(meal => {
-          meal.foods.forEach(food => {
-            const m = food.macronutrients || {};
-            consumed.calories += m.calories || 0;
-            consumed.protein_g += m.protein_g || 0;
-            consumed.carbohydrates_g += m.carbohydrates_g || 0;
-            consumed.fat_g += m.fat_g || 0;
-            consumed.fiber_g += m.fiber_g || 0;
-            if (food.food_id) consumedFoodIds.add(food.food_id);
-          });
-        });
-      }
-
+      const { consumed, consumedFoodIds } = getConsumedMacros();
       const targets = profile.calculated_targets || { calories: 2000, protein_g: 150, carbohydrates_g: 200, fat_g: 60, fiber_g: 30 };
       return {
         remaining: {
@@ -1736,93 +1650,55 @@
     }
 
     function getFoodRecommendationScore(food, remaining, mealName, consumedFoodIds, isVeg) {
-      // 1. Hide foods already eaten today for variety
       if (consumedFoodIds.has(food.food_id)) return -999;
-      
-      // 2. Strict diet preference filter
       if (isVeg && food.type !== "Vegetarian" && food.type !== "Vegan") return -999;
 
       const macros = food.macronutrients || {};
-      const mCal = macros.calories || 0;
-      const mPro = macros.protein_g || 0;
-      const mCarb = macros.carbohydrates_g || 0;
-      const mFat = macros.fat_g || 0;
-      const mFib = macros.fiber_g || 0;
-
       const remCal = Math.max(10, remaining.calories);
       const remPro = Math.max(1, remaining.protein_g);
       const remCarb = Math.max(1, remaining.carbohydrates_g);
       const remFat = Math.max(1, remaining.fat_g);
       const remFib = Math.max(1, remaining.fiber_g);
 
-      // Helper to score a macro ratio
       const scoreMacro = (val, rem, weight, remOriginal) => {
-        if (remOriginal <= 0) {
-          // Already met: slight penalty to discourage unnecessary intake and promote hitting other missing macros
-          return - (val * 0.02 * weight); 
-        }
+        if (remOriginal <= 0) return - (val * 0.02 * weight);
         const ratio = val / rem;
-        if (ratio <= 1) {
-          return ratio * weight; // Linear reward for filling the gap up to 100%
-        } else {
-          // Overshooting a needed macro: reward up to 100%, then gently penalize excess
-          return Math.max(0, (1 - (ratio - 1) * 0.5)) * weight;
-        }
+        return ratio <= 1 ? ratio * weight : Math.max(0, (1 - (ratio - 1) * 0.5)) * weight;
       };
 
       let score = 0;
-      // Protein is usually the hardest to hit, give it highest priority weight
-      score += scoreMacro(mPro, remPro, 3.0, remaining.protein_g);
-      // Fiber is highly valuable and often missed
-      score += scoreMacro(mFib, remFib, 1.5, remaining.fiber_g);
-      // Carbs and Fat balance the energy
-      score += scoreMacro(mCarb, remCarb, 1.0, remaining.carbohydrates_g);
-      score += scoreMacro(mFat, remFat, 1.0, remaining.fat_g);
+      score += scoreMacro(macros.protein_g || 0, remPro, 3.0, remaining.protein_g);
+      score += scoreMacro(macros.fiber_g || 0, remFib, 1.5, remaining.fiber_g);
+      score += scoreMacro(macros.carbohydrates_g || 0, remCarb, 1.0, remaining.carbohydrates_g);
+      score += scoreMacro(macros.fat_g || 0, remFat, 1.0, remaining.fat_g);
 
-      // Calorie budget penalty: a single food shouldn't eat up too much of the remaining calorie budget
-      const calRatio = mCal / remCal;
-      if (calRatio > 0.5) {
-        score -= (calRatio - 0.5) * 3.0; // Heavy penalty if it consumes >50% of remaining calories
-      }
+      const calRatio = (macros.calories || 0) / remCal;
+      if (calRatio > 0.5) score -= (calRatio - 0.5) * 3.0;
 
-      // Meal context bonus (improves relevance)
       const mealLower = mealName.toLowerCase();
-      if (mealLower.includes("breakfast") && (food.category?.toLowerCase().includes("breakfast") || food.taste === "sweet")) {
-        score += 0.5;
-      } else if ((mealLower.includes("lunch") || mealLower.includes("dinner")) && food.category?.toLowerCase().match(/lunch|dinner|salad|curry|rice|roti|meal/)) {
-        score += 0.3;
-      }
+      if (mealLower.includes("breakfast") && (food.category?.toLowerCase().includes("breakfast") || food.taste === "sweet")) score += 0.5;
+      else if ((mealLower.includes("lunch") || mealLower.includes("dinner")) && food.category?.toLowerCase().match(/lunch|dinner|salad|curry|rice|roti|meal/)) score += 0.3;
 
       return score;
     }
 
     function renderRecommendations(mealName) {
       if (!profile || !profile.calculated_targets) return;
-      
       const { remaining, consumedFoodIds } = getRemainingMacros();
-      const isVeg = (profile.diet_preference || "Vegetarian").toLowerCase().includes("veg") && 
-                    !(profile.diet_preference || "").toLowerCase().includes("non");
+      const isVeg = (profile.diet_preference || "Vegetarian").toLowerCase().includes("veg") && !(profile.diet_preference || "").toLowerCase().includes("non");
 
-      let scoredFoods = rawFoodDatabase.map(food => ({
-        food,
-        score: getFoodRecommendationScore(food, remaining, mealName, consumedFoodIds, isVeg)
-      }));
-
+      let scoredFoods = rawFoodDatabase.map(food => ({ food, score: getFoodRecommendationScore(food, remaining, mealName, consumedFoodIds, isVeg) }));
       scoredFoods.sort((a, b) => b.score - a.score);
-      const topFoods = scoredFoods.filter(f => f.score > -999).slice(0, 15).map(f => f.food);
-      
-      renderFoodGrid('recommendations-grid', topFoods);
+      renderFoodGrid('recommendations-grid', scoredFoods.filter(f => f.score > -999).slice(0, 15).map(f => f.food));
     }
 
     function renderFoodGrid(gridId, foodList) {
       const grid = document.getElementById(gridId);
       grid.innerHTML = '';
-
       if (foodList.length === 0) {
         grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-weight: 600;">No matching foods found that fit your remaining macros.</p>';
         return;
       }
-
       foodList.forEach(food => {
         const card = document.createElement('div');
         card.className = 'food-card-item';
@@ -1838,8 +1714,7 @@
               ${generateMacroBarsHTML(food.macronutrients)}
             </div>
             <button class="btn-add-to-meal" onclick="addFoodToActiveMeal('${food.food_id}')">+ ADD TO MEAL</button>
-          </div>
-        `;
+          </div>`;
         grid.appendChild(card);
       });
     }
@@ -1851,17 +1726,84 @@
       finderSearchInput.value = '';
       document.getElementById('search-results-section').style.display = 'none';
       document.getElementById('recommendations-section').style.display = 'block';
-
       renderRecommendations(mealName);
     }
 
-    window.addFoodToActiveMeal = function(foodId) {
+    let pendingFoodToAdd = null;
+    let suggestedRemoval = null;
+
+    function showCalorieWarning(newFood, projectedCalories, targetCalories) {
+      pendingFoodToAdd = newFood;
+      const modal = document.getElementById('calorie-warning-modal');
+      document.getElementById('calorie-warning-message').innerHTML = `Adding <strong>${newFood.name}</strong> will bring your daily total to <strong>${projectedCalories} kcal</strong>, exceeding your limit of <strong>${targetCalories} kcal</strong> by <strong>${projectedCalories - targetCalories} kcal</strong>.`;
+
+      let highestCalFood = null, highestCalMealIdx = -1, highestCalFoodIdx = -1, maxCal = 0;
+      mealPlannerParent.meals.forEach((meal, mIdx) => {
+        meal.foods.forEach((item, fIdx) => {
+          const food = item.food || item;
+          const qty = item.quantity || 1;
+          const cal = (food.macronutrients.calories || 0) * qty;
+          if (cal > maxCal) { maxCal = cal; highestCalFood = food; highestCalMealIdx = mIdx; highestCalFoodIdx = fIdx; }
+        });
+      });
+
+      const removalDiv = document.getElementById('suggested-removal');
+      const btnSwap = document.getElementById('btn-swap-add');
+      if (highestCalFood) {
+        suggestedRemoval = { mealIdx: highestCalMealIdx, foodIdx: highestCalFoodIdx, food: highestCalFood };
+        const currentMealIdx = mealPlannerParent.meals.findIndex(m => m.id === activeTargetMealId);
+        const mealName = highestCalMealIdx === currentMealIdx ? "this meal" : `your ${mealPlannerParent.meals[highestCalMealIdx].name}`;
+        removalDiv.innerHTML = `💡 <strong>Consider removing:</strong> <span style="color: #EF4444;">${highestCalFood.name}</span> (${Math.round(maxCal)} kcal) from ${mealName}. This will free up enough room.`;
+        btnSwap.style.display = 'block';
+      } else {
+        removalDiv.innerHTML = "You have no other items in your plan to remove. You will need to increase your calorie target or add this anyway.";
+        suggestedRemoval = null;
+        btnSwap.style.display = 'none';
+      }
+
+      const { remaining, consumedFoodIds } = getRemainingMacros();
+      const isVeg = (profile.diet_preference || "Vegetarian").toLowerCase().includes("veg") && !(profile.diet_preference || "").toLowerCase().includes("non");
+      
+      let alternatives = rawFoodDatabase.filter(f => !consumedFoodIds.has(f.food_id) && (f.macronutrients.calories || 0) <= remaining.calories && (isVeg ? (f.type === "Vegetarian" || f.type === "Vegan") : true));
+      let scoredAlts = alternatives.map(f => ({ food: f, score: getFoodRecommendationScore(f, remaining, "General", consumedFoodIds, isVeg) }));
+      scoredAlts.sort((a, b) => b.score - a.score);
+      const topAlts = scoredAlts.slice(0, 3).map(a => a.food);
+
+      const alternativesDiv = document.getElementById('suggested-alternatives');
+      alternativesDiv.innerHTML = '';
+      if (topAlts.length > 0) {
+        topAlts.forEach(f => {
+          alternativesDiv.innerHTML += `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border-color);">
+              <div>
+                <div style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase;">${f.name}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">${f.macronutrients.calories} kcal | ${f.macronutrients.protein_g}g Pro | ${f.macronutrients.fiber_g}g Fib</div>
+              </div>
+              <button class="btn-add-to-meal" style="width: auto; padding: 0.5rem 0.8rem; margin: 0; font-size: 0.7rem;" onclick="addFoodToActiveMeal('${f.food_id}', true); document.getElementById('calorie-warning-modal').classList.add('hidden');">Add Instead</button>
+            </div>`;
+        });
+      } else {
+        alternativesDiv.innerHTML = '<div style="font-size: 0.85rem; color: var(--text-muted); text-align: center; padding: 0.5rem;">No better alternatives found within your remaining budget.</div>';
+      }
+      modal.classList.remove('hidden');
+    }
+
+    window.addFoodToActiveMeal = function(foodId, force = false) {
       const foodObj = rawFoodDatabase.find(f => f.food_id === foodId);
       if (!foodObj || !activeTargetMealId) return;
 
+      const { consumed } = getConsumedMacros();
+      const projectedCalories = consumed.calories + foodObj.macronutrients.calories;
+      const targetCalories = profile.calculated_targets.calories || 0;
+
+      if (projectedCalories > targetCalories && !force) {
+        showCalorieWarning(foodObj, projectedCalories, targetCalories);
+        return;
+      }
+
       const targetMeal = mealPlannerParent.meals.find(m => m.id === activeTargetMealId);
       if (targetMeal) {
-        targetMeal.foods.push(foodObj);
+        targetMeal.foods.push({ food: foodObj, quantity: 1 });
         saveState();
         renderMeals();
         finderModal.classList.add('hidden');
@@ -1876,81 +1818,60 @@
       updateAuthUI();
 
       const authBtn = document.getElementById('auth-btn');
+      if (authBtn) authBtn.addEventListener('click', () => currentUser ? logout() : showAuthModal());
+
       const userDisplay = document.getElementById('user-display');
+      if (userDisplay) userDisplay.addEventListener('click', () => { if (currentUser) window.location.href = 'questionnaire.html'; });
+
       const closeModalBtn = document.getElementById('close-modal');
-      const authForm = document.getElementById('auth-form');
-      const btnCloseFinder = document.getElementById('btn-close-finder');
-
-      if (authBtn) {
-        authBtn.addEventListener('click', () => {
-          if (currentUser) logout();
-          else showAuthModal();
-        });
-      }
-
-      if (userDisplay) {
-        userDisplay.addEventListener('click', () => {
-          if (currentUser) {
-            window.location.href = 'questionnaire.html';
-          }
-        });
-      }
-
       if (closeModalBtn) closeModalBtn.addEventListener('click', hideAuthModal);
 
-      if (btnCloseFinder) {
-        btnCloseFinder.addEventListener('click', () => {
-          finderModal.classList.add('hidden');
-        });
-      }
+      const btnCloseFinder = document.getElementById('btn-close-finder');
+      if (btnCloseFinder) btnCloseFinder.addEventListener('click', () => finderModal.classList.add('hidden'));
 
+      // Warning Modal Listeners
+      document.getElementById('close-calorie-warning')?.addEventListener('click', () => { document.getElementById('calorie-warning-modal').classList.add('hidden'); pendingFoodToAdd = null; });
+      document.getElementById('btn-cancel-add')?.addEventListener('click', () => { document.getElementById('calorie-warning-modal').classList.add('hidden'); pendingFoodToAdd = null; });
+      document.getElementById('btn-force-add')?.addEventListener('click', () => {
+        if (pendingFoodToAdd) { addFoodToActiveMeal(pendingFoodToAdd.food_id, true); document.getElementById('calorie-warning-modal').classList.add('hidden'); pendingFoodToAdd = null; }
+      });
+      document.getElementById('btn-swap-add')?.addEventListener('click', () => {
+        if (pendingFoodToAdd && suggestedRemoval !== null) {
+          mealPlannerParent.meals[suggestedRemoval.mealIdx].foods.splice(suggestedRemoval.foodIdx, 1);
+          const targetMeal = mealPlannerParent.meals.find(m => m.id === activeTargetMealId);
+          if (targetMeal) targetMeal.foods.push(pendingFoodToAdd);
+          saveState(); renderMeals();
+          document.getElementById('calorie-warning-modal').classList.add('hidden');
+          finderModal.classList.add('hidden');
+          pendingFoodToAdd = null; suggestedRemoval = null;
+        }
+      });
+
+      const authForm = document.getElementById('auth-form');
       if (authForm) {
         authForm.addEventListener('submit', (e) => {
           e.preventDefault();
           const user = document.getElementById('auth-user').value.trim().toLowerCase();
           const pass = document.getElementById('auth-pass').value;
-
           if (!user || !pass) return;
-
           const users = getUsers();
-
           if (users[user]) {
-            if (users[user] === pass) {
-              login(user);
-              hideAuthModal();
-              authForm.reset();
-            } else {
-              alert('Wrong password! Please try again.');
-            }
+            if (users[user] === pass) { login(user); hideAuthModal(); authForm.reset(); }
+            else alert('Wrong password! Please try again.');
           } else {
-            users[user] = pass;
-            saveUsers(users);
-            alert('New account created!');
-            login(user);
-            hideAuthModal();
-            authForm.reset();
+            users[user] = pass; saveUsers(users); alert('New account created!'); login(user); hideAuthModal(); authForm.reset();
           }
         });
       }
 
-      const protectedLinks = document.querySelectorAll('.protected-link');
-      protectedLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-          const href = link.getAttribute('href');
-          requireAuth(e, href);
-        });
+      document.querySelectorAll('.protected-link').forEach(link => {
+        link.addEventListener('click', (e) => requireAuth(e, link.getAttribute('href')));
       });
 
       const authModal = document.getElementById('auth-modal');
-      if (authModal) {
-        authModal.addEventListener('click', (e) => {
-          if (e.target === authModal) hideAuthModal();
-        });
-      }
+      if (authModal) authModal.addEventListener('click', (e) => { if (e.target === authModal) hideAuthModal(); });
 
-      if (!currentUser) {
-        return;
-      }
+      if (!currentUser) return;
 
       await fetchFoodDatabase();
       loadMealPlannerState();
@@ -1961,23 +1882,15 @@
         renderMeals();
 
         document.getElementById('btn-add-new-meal').addEventListener('click', () => {
-          const newNum = mealPlannerParent.meals.length + 1;
-          mealPlannerParent.meals.push({
-            id: `m_${Date.now()}`,
-            name: `Meal ${newNum}`,
-            foods: []
-          });
-          saveState();
-          renderMeals();
+          mealPlannerParent.meals.push({ id: `m_${Date.now()}`, name: `Meal ${mealPlannerParent.meals.length + 1}`, foods: [] });
+          saveState(); renderMeals();
         });
 
         finderSearchInput.addEventListener('input', (e) => {
           const query = e.target.value.trim().toLowerCase();
-          
           if (!query) {
             document.getElementById('search-results-section').style.display = 'none';
             document.getElementById('recommendations-section').style.display = 'block';
-            // Re-render recommendations in case macros changed while modal was open
             if (activeTargetMealId) {
                const currentMeal = mealPlannerParent.meals.find(m => m.id === activeTargetMealId);
                if (currentMeal) renderRecommendations(currentMeal.name);
@@ -1989,32 +1902,16 @@
           document.getElementById('recommendations-section').style.display = 'none';
 
           const { remaining, consumedFoodIds } = getRemainingMacros();
-          const isVeg = (profile.diet_preference || "Vegetarian").toLowerCase().includes("veg") && 
-                        !(profile.diet_preference || "").toLowerCase().includes("non");
+          const isVeg = (profile.diet_preference || "Vegetarian").toLowerCase().includes("veg") && !(profile.diet_preference || "").toLowerCase().includes("non");
 
-          // First filter by search query
-          let filtered = rawFoodDatabase.filter(f => 
-            f.name.toLowerCase().includes(query) || 
-            (f.category && f.category.toLowerCase().includes(query))
-          );
-
-          // Then score and sort the filtered results using the SAME smart algorithm
-          let scoredFiltered = filtered.map(food => ({
-            food,
-            score: getFoodRecommendationScore(food, remaining, "General", consumedFoodIds, isVeg)
-          }));
-
+          let filtered = rawFoodDatabase.filter(f => f.name.toLowerCase().includes(query) || (f.category && f.category.toLowerCase().includes(query)));
+          let scoredFiltered = filtered.map(food => ({ food, score: getFoodRecommendationScore(food, remaining, "General", consumedFoodIds, isVeg) }));
           scoredFiltered.sort((a, b) => b.score - a.score);
-          
-          // Show top 15 matching results that are actually good for the user's remaining macros
-          const topSearchFoods = scoredFiltered.filter(f => f.score > -999).slice(0, 15).map(f => f.food);
-          
-          renderFoodGrid('search-results-grid', topSearchFoods);
+          renderFoodGrid('search-results-grid', scoredFiltered.filter(f => f.score > -999).slice(0, 15).map(f => f.food));
         });
 
         document.querySelectorAll('.nav-btn').forEach(link => {
-          const href = link.getAttribute('href');
-          if (href === 'my-meals.html' && link.classList.contains('active')) {
+          if (link.getAttribute('href') === 'my-meals.html' && link.classList.contains('active')) {
             link.addEventListener('click', (e) => e.preventDefault());
           }
         });

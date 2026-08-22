@@ -141,13 +141,13 @@ Follow these steps to run MacroVerse locally.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/macroverse.git
+git clone https://github.com/yourusername/macroverse.git](https://github.com/ArshdeepSingh728281/MacroPhase-1Sem5.git
 ```
 
 ### 2. Navigate into the project folder
 
 ```bash
-cd macroverse
+cd MacroPhase-1Sem5
 ```
 
 ### 3. Open the project

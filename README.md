@@ -94,19 +94,19 @@ Users can manage:
 
 ## 🏠 Landing Page
 
-![Home Page](assets/home.png)
+![Home Page](assets/screenshots/home.png)
 
 ---
 
 ## 🍽️ Meal Planner Dashboard
 
-![Meal Planner](assets/meal-planner.png)
+![Meal Planner](assets/screenshots/meal-planner.png)
 
 ---
 
 ## 🔍 Food Database Search
 
-![Food Database](assets/food-database.png)
+![Food Database](assets/screenshots/food-database.png)
 
 ---
 

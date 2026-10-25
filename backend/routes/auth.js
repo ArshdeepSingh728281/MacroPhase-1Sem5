@@ -31,9 +31,11 @@ router.post("/signup", async (req, res, next) => {
     const email = String(req.body.email || "").trim().toLowerCase();
     const password = String(req.body.password || "");
 
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      return res.status(400).json({ message: "Enter a valid email address" });
-    }
+if (!/^\S+@\S+\.\S+$/.test(email)) {
+  return res.status(400).json({
+    message: "Enter a valid email address"
+  });
+}
 
     if (password.length < 8) {
       return res.status(400).json({

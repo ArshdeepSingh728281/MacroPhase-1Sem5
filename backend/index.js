@@ -14,6 +14,10 @@ const port = Number(process.env.PORT) || 5000;
 const foodFile = path.join(__dirname, "../data.json");
 
 const defaultOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://localhost:5500",
+  "http://127.0.0.1:5500",
   "https://macrophase-1sem5-frontend.vercel.app"
 ];
 const allowedOrigins = process.env.FRONTEND_ORIGIN

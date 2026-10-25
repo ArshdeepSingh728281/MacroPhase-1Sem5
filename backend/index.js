@@ -18,7 +18,7 @@ const defaultOrigins = [
   "http://127.0.0.1:5173",
   "http://localhost:5500",
   "http://127.0.0.1:5500",
-  "https://macrophase-1sem5-frontend.vercel.app"
+  "https://macro-verse.vercel.app"
 ];
 const allowedOrigins = process.env.FRONTEND_ORIGIN
   ? process.env.FRONTEND_ORIGIN.split(",").map((origin) => origin.trim())

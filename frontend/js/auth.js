@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.removeItem("mv_token");
       localStorage.removeItem("mv_user");
       updateAuthInterface();
-      window.location.href = "/index.html";
+      window.location.href = "index.html";
     }
   };
 

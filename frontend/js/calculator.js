@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!form) return;
 
   if (!localStorage.getItem("mv_token")) {
-    window.location.href = "/index.html";
+    window.location.href = "index.html";
     return;
   }
 
@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
         popup.classList.remove("hidden");
       } else {
         alert("Profile saved successfully.");
-        window.location.href = "/my-meals.html";
+        window.location.href = "my-meals.html";
       }
     } catch (error) {
       alert(`Could not save your profile: ${error.message}`);
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("popup-confirm-btn")?.addEventListener("click", () => {
-    window.location.href = "/my-meals.html";
+    window.location.href = "my-meals.html";
   });
 
   document.getElementById("popup-change-btn")?.addEventListener("click", () => {

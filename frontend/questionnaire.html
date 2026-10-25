@@ -777,7 +777,7 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       const token = localStorage.getItem('mv_token');
-      if (!token) { window.location.href = '/index.html'; return; }
+      if (!token) { window.location.href = 'index.html'; return; }
 
       const steps = Array.from(document.querySelectorAll('.question-step'));
       const progressBar = document.getElementById('progress-bar');
@@ -817,7 +817,7 @@
         });
       } catch (error) {
         console.error('Could not load saved onboarding profile:', error);
-        if (/authentication|token|account/i.test(error.message)) { window.location.href = '/index.html'; return; }
+        if (/authentication|token|account/i.test(error.message)) { window.location.href = 'index.html'; return; }
       }
 
       function refreshRadioHighlights() {
@@ -934,7 +934,7 @@
           updatePopupValues(daysSlider ? daysSlider.value : 30);
           activeFormData.onboarding_completed = true;
           await persistProfile(activeFormData);
-          window.location.href = '/my-meals.html';
+          window.location.href = 'my-meals.html';
         } catch (error) {
           alert(`Your profile is not saved yet. Please try again.\n${error.message}`);
         } finally {
@@ -952,9 +952,9 @@
       updateUI();
     });
   </script>
-  <script src="/js/config.js"></script>
-  <script src="/js/api.js"></script>
-  <script src="/js/auth.js"></script>
-  <script src="/js/app.js"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/api.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/app.js"></script>
 </body>
 </html>

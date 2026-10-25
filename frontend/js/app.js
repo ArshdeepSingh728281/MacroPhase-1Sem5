@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileForm = $("profile-edit-form");
   if (profileForm) {
     if (!localStorage.getItem("mv_token")) {
-      window.location.href = "/index.html";
+      window.location.href = "index.html";
       return;
     }
 

@@ -99,8 +99,8 @@ document.addEventListener("DOMContentLoaded", () => {
         || profile.onboarding_completed === "true";
 
       window.location.href = onboardingComplete
-        ? "/my-meals.html"
-        : "/questionnaire.html";
+        ? "my-meals.html"
+        : "questionnaire.html";
     } catch (error) {
       alert(error.message);
     } finally {

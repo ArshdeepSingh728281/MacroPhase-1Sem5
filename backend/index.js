@@ -20,16 +20,21 @@ const allowedOrigins = process.env.FRONTEND_ORIGIN
   ? process.env.FRONTEND_ORIGIN.split(",").map((origin) => origin.trim())
   : defaultOrigins;
 
-app.use(cors({
-  origin(origin, callback) {
-    // Requests without an Origin header (e.g. curl or server-to-server) are allowed.
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+// app.use(cors({
+//   origin(origin, callback) {
+//     // Requests without an Origin header (e.g. curl or server-to-server) are allowed.
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       return callback(null, true);
+//     }
 
-    return callback(new Error(`CORS blocked origin: ${origin}`));
-  }
-}));
+//     return callback(new Error(`CORS blocked origin: ${origin}`));
+//   }
+// }));
+
+
+app.use(cors({ origin: "*" }));
+
+
 app.use(express.json({ limit: "2mb" }));
 app.use(morgan("dev"));
 

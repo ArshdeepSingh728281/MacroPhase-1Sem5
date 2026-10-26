@@ -1015,7 +1015,7 @@
     "meal_type": [
       "Breakfast",
       "Lunch",
-      "Dinner",
+      
       "Snack"
     ],
     "diet_tags": [
@@ -1057,7 +1057,7 @@
     "meal_type": [
       "Breakfast",
       "Lunch",
-      "Dinner",
+      
       "Snack"
     ],
     "diet_tags": [
@@ -1223,7 +1223,7 @@
       "protein_g": 27
     },
     "meal_type": [
-      "Lunch",
+      
       "Dinner",
       "Snack"
     ],
@@ -2336,8 +2336,8 @@
       "Vegetarian",
       "Vegan",
       "Indian",
-      "High Fiber",
-      "Plant Protein"
+      "High Fiber"
+      
     ],
     "is_common_food": true,
     "image_url": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Chana_masala.jpg"
@@ -3360,7 +3360,7 @@
     },
     "meal_type": [
       "Breakfast",
-      "Lunch",
+      
       "Snack"
     ],
     "diet_tags": [
